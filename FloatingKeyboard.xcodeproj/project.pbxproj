@@ -8,6 +8,7 @@
 
 /* Begin PBXFileReference section */
 		8378F4352F5E1B4A009B6093 /* FloatingKeyboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FloatingKeyboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D42F5E2000009B6093 /* FloatingKeyboardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FloatingKeyboardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +17,22 @@
 			path = FloatingKeyboard;
 			sourceTree = "<group>";
 		};
+		A1B2C3D72F5E2000009B6093 /* FloatingKeyboardTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FloatingKeyboardTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		8378F4322F5E1B4A009B6093 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1B2C3D12F5E2000009B6093 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +46,7 @@
 			isa = PBXGroup;
 			children = (
 				8378F4372F5E1B4A009B6093 /* FloatingKeyboard */,
+				A1B2C3D72F5E2000009B6093 /* FloatingKeyboardTests */,
 				8378F4362F5E1B4A009B6093 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				8378F4352F5E1B4A009B6093 /* FloatingKeyboard.app */,
+				A1B2C3D42F5E2000009B6093 /* FloatingKeyboardTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +85,27 @@
 			productReference = 8378F4352F5E1B4A009B6093 /* FloatingKeyboard.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A1B2C3D32F5E2000009B6093 /* FloatingKeyboardTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1B2C3DA2F5E2000009B6093 /* Build configuration list for PBXNativeTarget "FloatingKeyboardTests" */;
+			buildPhases = (
+				A1B2C3D02F5E2000009B6093 /* Sources */,
+				A1B2C3D12F5E2000009B6093 /* Frameworks */,
+				A1B2C3D22F5E2000009B6093 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A1B2C3D62F5E2000009B6093 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A1B2C3D72F5E2000009B6093 /* FloatingKeyboardTests */,
+			);
+			name = FloatingKeyboardTests;
+			productName = FloatingKeyboardTests;
+			productReference = A1B2C3D42F5E2000009B6093 /* FloatingKeyboardTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -82,6 +118,11 @@
 				TargetAttributes = {
 					8378F4342F5E1B4A009B6093 = {
 						CreatedOnToolsVersion = 26.3;
+						LastSwiftMigration = 2630;
+					};
+					A1B2C3D32F5E2000009B6093 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 8378F4342F5E1B4A009B6093;
 					};
 				};
 			};
@@ -100,12 +141,20 @@
 			projectRoot = "";
 			targets = (
 				8378F4342F5E1B4A009B6093 /* FloatingKeyboard */,
+				A1B2C3D32F5E2000009B6093 /* FloatingKeyboardTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8378F4332F5E1B4A009B6093 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1B2C3D22F5E2000009B6093 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +171,32 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A1B2C3D02F5E2000009B6093 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A1B2C3D62F5E2000009B6093 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8378F4342F5E1B4A009B6093 /* FloatingKeyboard */;
+			targetProxy = A1B2C3D52F5E2000009B6093 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		A1B2C3D52F5E2000009B6093 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8378F42D2F5E1B4A009B6093 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8378F4342F5E1B4A009B6093;
+			remoteInfo = FloatingKeyboard;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin XCBuildConfiguration section */
 		8378F43E2F5E1B50009B6093 /* Debug */ = {
@@ -179,7 +253,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -237,7 +311,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -250,12 +324,49 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z8FHM5M8LV;
-				ENABLE_APP_SANDBOX = YES;
-				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				CODE_SIGN_ENTITLEMENTS = FloatingKeyboard/FloatingKeyboard.entitlements;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = manolo.FloatingKeyboard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		8378F4422F5E1B50009B6093 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z8FHM5M8LV;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				CODE_SIGN_ENTITLEMENTS = FloatingKeyboard/FloatingKeyboard.entitlements;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -275,37 +386,45 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
-			name = Debug;
+			name = Release;
 		};
-		8378F4422F5E1B50009B6093 /* Release */ = {
+		A1B2C3DB2F5E2000009B6093 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z8FHM5M8LV;
-				ENABLE_APP_SANDBOX = YES;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = manolo.FloatingKeyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = manolo.FloatingKeyboardTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				REGISTER_APP_GROUPS = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FloatingKeyboard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FloatingKeyboard";
+			};
+			name = Debug;
+		};
+		A1B2C3DC2F5E2000009B6093 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z8FHM5M8LV;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = manolo.FloatingKeyboardTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FloatingKeyboard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FloatingKeyboard";
 			};
 			name = Release;
 		};
@@ -326,6 +445,15 @@
 			buildConfigurations = (
 				8378F4412F5E1B50009B6093 /* Debug */,
 				8378F4422F5E1B50009B6093 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1B2C3DA2F5E2000009B6093 /* Build configuration list for PBXNativeTarget "FloatingKeyboardTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C3DB2F5E2000009B6093 /* Debug */,
+				A1B2C3DC2F5E2000009B6093 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

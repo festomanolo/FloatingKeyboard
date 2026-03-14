@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Info.plist for FloatingKeyboard
+  ─────────────────────────────────────────────────────────────────────────────
+  Drop this into your Xcode target's "Info" section (or keep as a custom file
+  and point the target at it).  Xcode will also auto-generate some of these
+  keys; make sure the descriptions below are present.
+-->
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+
+    <key>CFBundleName</key>
+    <string>FloatingKeyboard</string>
+
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+
+    <key>LSMinimumSystemVersion</key>
+    <string>15.0</string>
+
+    <!--
+        Required: Accessibility API usage description.
+        Shown in System Settings → Privacy & Security → Accessibility.
+    -->
+    <key>NSAccessibilityUsageDescription</key>
+    <string>FloatingKeyboard uses Accessibility to detect when a text field is focused (so the keyboard can appear automatically) and to send key events to other applications.</string>
+
+    <key>NSAppleEventsUsageDescription</key>
+    <string>FloatingKeyboard uses AppleEvents to automatically hide and show the macOS Dock when entering Tablet Mode.</string>
+
+    <!--
+        Keep the app out of the Dock and App Switcher — it lives in the
+        menu bar only.
+    -->
+    <key>LSUIElement</key>
+    <true/>
+
+    <!--
+        Prevent automatic termination so the keyboard is always ready.
+    -->
+    <key>NSSupportsSuddenTermination</key>
+    <false/>
+</dict>
+</plist>

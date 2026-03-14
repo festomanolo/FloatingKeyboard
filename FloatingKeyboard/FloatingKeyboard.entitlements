@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  FloatingKeyboard.entitlements
+  ─────────────────────────────────────────────────────────────────────────────
+  ⚠️  App Sandbox MUST be disabled for:
+      • AXUIElementCreateSystemWide() (cross-process AX queries)
+      • CGEvent.post(tap: .cghidEventTap) (system-wide key injection)
+
+  This means the app CANNOT be distributed via the Mac App Store without
+  significant rework.  For a Hackintosh utility that stays local, this is fine.
+-->
+<plist version="1.0">
+<dict>
+    <!-- Disable the sandbox entirely -->
+    <key>com.apple.security.app-sandbox</key>
+    <false/>
+
+    <!--
+        Accessibility automation entitlement.
+        Still requires the user to grant access in System Settings.
+    -->
+    <key>com.apple.security.automation.apple-events</key>
+    <true/>
+</dict>
+</plist>
