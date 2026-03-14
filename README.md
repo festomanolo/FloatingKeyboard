@@ -20,6 +20,7 @@
 ## 🏔️ A Masterpiece Apple Wishes They Built
 
 Let's address the elephant in the room: Apple still hasn't made a touch-screen MacBook. But when they finally catch up to the year 2026, **FloatingKeyboard** will be waiting. Until then, this app completely transforms the experience for:
+- Touch Screen MacBook Pro's which only Manolo have, was a special order from andromeda
 - iPad running macOS apps (via Mac Catalyst or native wizardry)
 - The brave souls running external touch displays
 - Anyone who just wants a sick, animated keyboard hovering on their screen.
