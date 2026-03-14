@@ -33,18 +33,7 @@ Let's address the elephant in the room: Apple still hasn't made a touch-screen M
 Because seeing is believing, and because Jony Ive would cry tears of joy if he saw this frosted glass implementation:
 
 <div align="center">
-  <img src="screenshots/Screenshot%202026-03-14%20at%2023.43.33.png" width="48%">
-  <img src="screenshots/Screenshot%202026-03-14%20at%2023.43.48.png" width="48%">
-</div>
-<br>
-<div align="center">
-  <img src="screenshots/Screenshot%202026-03-14%20at%2023.43.53.png" width="48%">
-  <img src="screenshots/Screenshot%202026-03-14%20at%2023.43.57.png" width="48%">
-</div>
-<br>
-<div align="center">
-  <img src="screenshots/Screenshot%202026-03-14%20at%2023.44.05.png" width="48%">
-  <img src="screenshots/Screenshot%202026-03-14%20at%2023.44.14.png" width="48%">
+  <img src="screenshots/demo.gif" width="80%">
 </div>
 
 ---
