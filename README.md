@@ -115,7 +115,7 @@ Fork it, branch it, commit it, and PR it. Just keep the code cleaner than a fres
 
 ## 🎯 Final Words
 
-*Tim, if you're reading this from your secret underground office in Apple Park: You missed your chance. I'm shipping this directly to GitHub, completely open-source. Try not to copy it too closely in macOS 16, okay?* 😉
+*Tim, if you're reading this from your secret underground office in Apple Park: You missed your chance. I'm shipping this directly to GitHub, completely open-source. Try not to copy it too closely in macOS 27, okay?* 😉
 
 <div align="center">
 
