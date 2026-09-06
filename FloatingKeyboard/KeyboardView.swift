@@ -27,8 +27,9 @@ struct KeySpec: Identifiable {
         case fixed(CGKeyCode)       // fixed key: backspace, return, tab, esc …
         case shift                  // toggles shift modifier
         case capsLock               // toggles caps lock
-        case modifier(CGKeyCode)    // stateless modifier tap: cmd, opt, ctrl
+        case modifier(ModifierKey, CGKeyCode) // modifier key with its ModifierKey enum!
         case emojiPicker            // opens system emoji picker
+        case displayRotation        // toggles display 180° rotation
     }
 
     let id        = UUID()
@@ -118,17 +119,150 @@ private let kRow4: [KeySpec] = [
 
 private let kRow5: [KeySpec] = [
     .init(label: "esc",   symbol: nil, flex: 1.2, action: .fixed(53)),
-    .init(label: "ctrl",  symbol: nil, flex: 1.2, action: .modifier(59)),
-    .init(label: "opt",   symbol: nil, flex: 1.2, action: .modifier(58)),
-    .init(label: "⌘",     symbol: nil, flex: 1.3, action: .modifier(55)),
-    .init(label: "space", symbol: nil, flex: 5.8, action: .fixed(49)),
-    .init(label: "⌘",     symbol: nil, flex: 1.3, action: .modifier(55)),
+    .init(label: "ctrl",  symbol: nil, flex: 1.2, action: .modifier(.control, 59)),
+    .init(label: "opt",   symbol: nil, flex: 1.2, action: .modifier(.option, 58)),
+    .init(label: "⌘",     symbol: nil, flex: 1.3, action: .modifier(.command, 55)),
+    .init(label: "space", symbol: nil, flex: 5.0, action: .fixed(49)),
+    .init(label: "⌘",     symbol: nil, flex: 1.3, action: .modifier(.command, 55)),
+    .init(label: "", symbol: "rotate.right", flex: 1.2, action: .displayRotation),
     .init(label: "", symbol: "face.smiling", flex: 1.2, action: .emojiPicker),
     .init(label: "", symbol: "arrow.left",  flex: 1.0, action: .fixed(123)),
     .init(label: "", symbol: "arrow.down",  flex: 1.0, action: .fixed(125)),
     .init(label: "", symbol: "arrow.up",    flex: 1.0, action: .fixed(126)),
     .init(label: "", symbol: "arrow.right", flex: 1.0, action: .fixed(124)),
 ]
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MARK: – Standard Desktop Numpad Rows (on the right of normal keys)
+// ═══════════════════════════════════════════════════════════════════════════
+// Key codes:
+//   clear=71  equal=81  divide=75  multiply=67
+//   7=89  8=91  9=92  minus=78
+//   4=86  5=87  6=88  plus=69
+//   1=83  2=84  3=85  enter=76
+//   0=82  decimal=65
+
+private let kNumpadRowF: [KeySpec] = [
+    .init(label: "clear", flex: 1.0, action: .fixed(71)),
+    .init(label: "=",     flex: 1.0, action: .character(81)),
+    .init(label: "/",     flex: 1.0, action: .character(75)),
+    .init(label: "*",     flex: 1.0, action: .character(67))
+]
+
+private let kNumpadRow1: [KeySpec] = [
+    .init("7", "7", keyCode: 89, flex: 1.0),
+    .init("8", "8", keyCode: 91, flex: 1.0),
+    .init("9", "9", keyCode: 92, flex: 1.0),
+    .init("-", "-", keyCode: 78, flex: 1.0)
+]
+
+private let kNumpadRow2: [KeySpec] = [
+    .init("4", "4", keyCode: 86, flex: 1.0),
+    .init("5", "5", keyCode: 87, flex: 1.0),
+    .init("6", "6", keyCode: 88, flex: 1.0),
+    .init("+", "+", keyCode: 69, flex: 1.0)
+]
+
+private let kNumpadRow3: [KeySpec] = [
+    .init("1", "1", keyCode: 83, flex: 1.0),
+    .init("2", "2", keyCode: 84, flex: 1.0),
+    .init("3", "3", keyCode: 85, flex: 1.0),
+    .init(label: "", symbol: "return.left", flex: 1.0, action: .fixed(76))
+]
+
+private let kNumpadRow4: [KeySpec] = [
+    .init("0", "0", keyCode: 82, flex: 2.05),
+    .init(".", ".", keyCode: 65, flex: 1.0),
+    .init(label: "", symbol: "return.left", flex: 1.0, action: .fixed(76))
+]
+
+private let kNumpadRow5: [KeySpec] = [
+    .init("00", "00", keyCode: 82, flex: 1.0),
+    .init(",", ",", keyCode: 43, flex: 1.0),
+    .init(label: "", symbol: "delete.backward.fill", flex: 1.0, action: .fixed(51)),
+    .init(label: "=", flex: 1.0, action: .character(81))
+]
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MARK: – SafariTabPill (Safari-style Layout Picker)
+// ═══════════════════════════════════════════════════════════════════════════
+
+struct SafariTabPill: View {
+    let layout: KeyboardLayout
+    let isSelected: Bool
+    let foreground: Color
+    let action: () -> Void
+
+    @State private var isHovered = false
+
+    private var icon: String {
+        switch layout {
+        case .full:    return "macwindow"
+        case .compact: return "rectangle.compress.vertical"
+        case .numpad:  return "square.grid.3x3.fill"
+        }
+    }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 9.5, weight: isSelected ? .bold : .medium))
+                Text(layout.rawValue)
+                    .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
+            }
+            .padding(.horizontal, 8)
+            .frame(height: 20)
+            .background(
+                Capsule()
+                    .fill(isSelected ? Color.accentColor : (isHovered ? Color.primary.opacity(0.08) : Color.clear))
+                    .shadow(color: isSelected ? Color.accentColor.opacity(0.35) : .clear, radius: 3, y: 1)
+            )
+            .foregroundStyle(isSelected ? Color.white : foreground)
+        }
+        .buttonStyle(.plain)
+        .onHover { isHovered = $0 }
+        .animation(.spring(response: 0.22, dampingFraction: 0.75), value: isSelected)
+        .animation(.easeInOut(duration: 0.15), value: isHovered)
+        .help("Switch to \(layout.rawValue) Layout")
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MARK: – SizePresetButton
+// ═══════════════════════════════════════════════════════════════════════════
+
+struct SizePresetButton: View {
+    let preset: WindowSizePreset
+    let isSelected: Bool
+    let foreground: Color
+    let action: () -> Void
+
+    private var title: String {
+        switch preset {
+        case .compact:  return "S"
+        case .standard: return "M"
+        case .comfort:  return "L"
+        case .docked:   return "Dock"
+        }
+    }
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 10, weight: .bold))
+                .frame(minWidth: preset == .docked ? 34 : 20)
+                .frame(height: 20)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? Color.accentColor : Color.clear)
+                )
+                .foregroundStyle(isSelected ? Color.white : foreground)
+        }
+        .buttonStyle(.plain)
+        .help("Size Preset: \(preset.rawValue)")
+    }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MARK: – KeyboardContainerView  (glass shell + toolbar)
@@ -142,7 +276,7 @@ struct KeyboardContainerView: View {
     let timer = Timer.publish(every: 2.0, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottomTrailing) {
             glassBackground
             VStack(spacing: 0) {
                 if !isAXTrusted {
@@ -162,13 +296,13 @@ struct KeyboardContainerView: View {
                 }
                 
                 topBar
-                    .padding(.horizontal, 16)
-                    .padding(.top, 24) // Added padding to push content below traffic lights
-                    .padding(.bottom, 4)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 8)
+                    .padding(.bottom, 2)
                     
-                DragHandleView()
+                DragHandleView(isLocked: viewModel.isPositionLocked)
 
-                Divider().opacity(0.25)
+                Divider().opacity(0.20)
 
                 ZStack {
                     // MARK: - Live Background Layer
@@ -185,9 +319,9 @@ struct KeyboardContainerView: View {
                     
                     HStack(spacing: 0) {
                         layoutContent
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, 8)
+                            .padding(.bottom, 4)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .scaleEffect(x: (viewModel.isSettingsVisible || viewModel.isClipboardVisible || viewModel.isAboutVisible) ? 0.95 : 1.0, anchor: .leading)
                             .offset(x: viewModel.isLightningActive ? CGFloat.random(in: -4...4) : 0,
                                    y: viewModel.isLightningActive ? CGFloat.random(in: -4...4) : 0)
@@ -202,7 +336,7 @@ struct KeyboardContainerView: View {
                             Divider()
                             InlineClipboardView(viewModel: viewModel)
                                 .frame(width: 420) 
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
                         } else if viewModel.isAboutVisible {
                             Divider()
                             InlineAboutView(viewModel: viewModel)
@@ -215,6 +349,10 @@ struct KeyboardContainerView: View {
                     .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.isAboutVisible)
                 }
             }
+            
+            // Dedicated touch-friendly resize grip in bottom-right corner
+            TouchResizeHandle()
+                .padding(4)
         }
         // Apply the opacity the user set with the slider.
         .opacity(viewModel.opacity)
@@ -290,51 +428,110 @@ struct KeyboardContainerView: View {
     // MARK: Top toolbar
 
     private var topBar: some View {
-        HStack(spacing: 10) {
-            // ── Layout switcher (Safari-style Pill) ────────────────────────
-            HStack(spacing: 0) {
-                Picker("Layout", selection: Binding(
-                    get: { viewModel.layout },
-                    set: { viewModel.layout = $0 }
-                )) {
-                    ForEach(KeyboardLayout.allCases) { l in
-                        Text(l.rawValue).tag(l)
+        HStack(spacing: 6) {
+            // ── Safari-style Layout Switcher Pill [Desktop] [Compact] [Numpad] ──
+            HStack(spacing: 2) {
+                ForEach(KeyboardLayout.allCases) { l in
+                    SafariTabPill(
+                        layout: l,
+                        isSelected: viewModel.layout == l,
+                        foreground: topBarForeground
+                    ) {
+                        viewModel.playButtonSound()
+                        withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+                            viewModel.layout = l
+                        }
                     }
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 140)
-                .labelsHidden()
             }
-            .padding(4)
+            .padding(3)
             .background(Capsule().fill(Color.primary.opacity(0.06)))
+            
+            // ── Touchscreen Size Presets Pill [S] [M] [L] [Dock] ──────────
+            HStack(spacing: 2) {
+                ForEach(WindowSizePreset.allCases) { preset in
+                    SizePresetButton(
+                        preset: preset,
+                        isSelected: viewModel.activeSizePreset == preset,
+                        foreground: topBarForeground
+                    ) {
+                        viewModel.playButtonSound()
+                        viewModel.activeSizePreset = preset
+                    }
+                }
+            }
+            .padding(3)
+            .background(Capsule().fill(Color.primary.opacity(0.06)))
+
+            // ── Mechanical Sound Switch Menu ──────────────────────────────
+            Menu {
+                Toggle("Mechanical Switch Sounds", isOn: Binding(
+                    get: { viewModel.soundEnabled },
+                    set: { 
+                        viewModel.soundEnabled = $0
+                        if $0 { viewModel.playButtonSound() }
+                    }
+                ))
+                
+                Divider()
+                
+                ForEach(SoundProfile.allCases) { profile in
+                    Button {
+                        viewModel.selectedSoundProfile = profile
+                        viewModel.playButtonSound()
+                    } label: {
+                        HStack {
+                            Text(profile.rawValue)
+                            if viewModel.selectedSoundProfile == profile {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "waveform.circle.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(viewModel.soundEnabled ? Color.blue : Color.secondary)
+                    Text(viewModel.selectedSoundProfile.rawValue.components(separatedBy: " ").first ?? "Switch")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(topBarForeground)
+                }
+                .padding(.horizontal, 7)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(Color.primary.opacity(0.06)))
+            }
+            .menuStyle(.borderlessButton)
+            .help("Mechanical Switch Sound Profile")
             
             Spacer()
             
             // ── System Controls Group ──────────────────────────────────────
-            HStack(spacing: 8) {
-                // Volume Control (Wider)
-                PillSlider(icon: volumeIcon, value: $volume, color: .blue, width: 140) {
+            HStack(spacing: 4) {
+                // Volume Control
+                PillSlider(icon: volumeIcon, value: $volume, color: .blue, width: 80) {
                     setSystemVolume(volume)
                 }
                 
-                // Brightness Control (Wider)
-                PillSlider(icon: "sun.max.fill", value: $brightness, color: .orange, width: 140) {
+                // Brightness Control
+                PillSlider(icon: "sun.max.fill", value: $brightness, color: .orange, width: 80) {
                     setSystemBrightness(brightness)
                 }
 
-                // Opacity slider (Wider)
+                // Opacity slider
                 PillSlider(icon: "circle.dotted", value: Binding(
                     get: { viewModel.opacity },
                     set: { viewModel.opacity = $0 }
-                ), color: .secondary, width: 140, range: 0.25...1.0) { }
+                ), color: .secondary, width: 80, range: 0.25...1.0) { }
             }
             
             Spacer()
 
             // ── Actions Group (Safari-style Pill) ──────────────────────────
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 // Dock Toggle
                 Button {
+                    viewModel.playButtonSound()
                     viewModel.toggleSystemDock()
                     withAnimation(.spring(response: 0.2, dampingFraction: 0.5)) {
                         isDockButtonPressed = true
@@ -354,8 +551,24 @@ struct KeyboardContainerView: View {
                 .buttonStyle(.plain)
                 .help("Toggle Dock Visibility")
 
+                // Position Lock Toggle
+                Button {
+                    viewModel.playButtonSound()
+                    withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+                        viewModel.isPositionLocked.toggle()
+                    }
+                } label: {
+                    Image(systemName: viewModel.isPositionLocked ? "lock.fill" : "lock.open.fill")
+                        .font(.title3)
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(viewModel.isPositionLocked ? Color.orange : topBarForeground)
+                }
+                .buttonStyle(.plain)
+                .help(viewModel.isPositionLocked ? "Position Locked (Tap to Unlock Repositioning)" : "Position Unlocked (Drag anywhere on background to move)")
+
                 // About button
                 Button {
+                    viewModel.playButtonSound()
                     withAnimation {
                         viewModel.isAboutVisible.toggle()
                     }
@@ -370,6 +583,7 @@ struct KeyboardContainerView: View {
 
                 // Clipboard button
                 Button {
+                    viewModel.playButtonSound()
                     withAnimation {
                         viewModel.isClipboardVisible.toggle()
                     }
@@ -384,6 +598,7 @@ struct KeyboardContainerView: View {
 
                 // Settings button
                 Button {
+                    viewModel.playButtonSound()
                     withAnimation {
                         viewModel.isSettingsVisible.toggle()
                     }
@@ -400,6 +615,7 @@ struct KeyboardContainerView: View {
 
                 // Hide button
                 Button {
+                    viewModel.playButtonSound()
                     AppDelegate.shared?.keyboardPanel?.hide()
                 } label: {
                     Image(systemName: "chevron.down.circle.fill")
@@ -410,8 +626,8 @@ struct KeyboardContainerView: View {
                 .buttonStyle(.plain)
                 .help("Hide")
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
             .background(Capsule().fill(Color.primary.opacity(0.06)))
         }
         .onAppear {
@@ -469,8 +685,9 @@ struct KeyboardContainerView: View {
     @ViewBuilder
     private var layoutContent: some View {
         switch viewModel.layout {
-        case .full:   FullKeyboardView(viewModel: viewModel)
-        case .numpad: NumpadView(viewModel: viewModel)
+        case .full:    FullKeyboardView(viewModel: viewModel)
+        case .compact: CompactKeyboardView(viewModel: viewModel)
+        case .numpad:  NumpadView(viewModel: viewModel)
         }
     }
 }
@@ -541,24 +758,68 @@ struct CompactSlider: View {
 // ═══════════════════════════════════════════════════════════════════════════
 
 struct DragHandleView: View {
+    let isLocked: Bool
     @State private var isHovered = false
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 1.5)
-            .fill(Color.primary.opacity(isHovered ? 0.45 : 0.25))
-            .frame(width: 36, height: 3)
-            .onHover { hovering in
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    isHovered = hovering
-                }
+        HStack(spacing: 4) {
+            if isLocked {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 7, weight: .bold))
+                    .foregroundStyle(Color.secondary.opacity(0.45))
             }
-            .padding(.bottom, 4)
+            RoundedRectangle(cornerRadius: 1.5)
+                .fill(isLocked ? Color.secondary.opacity(0.25) : (isHovered ? Color.primary.opacity(0.55) : Color.primary.opacity(0.35)))
+                .frame(width: isLocked ? 28 : 42, height: 3)
+        }
+        .frame(height: 8)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isHovered = hovering
+            }
+        }
+        .padding(.bottom, 4)
+        .help(isLocked ? "Keyboard position locked. Unlock with the lock button in the top bar to move." : "Keyboard position unlocked. Drag to move.")
     }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// MARK: – CompactSlider (Volume & Brightness)
+// MARK: – TouchResizeHandle
 // ═══════════════════════════════════════════════════════════════════════════
+
+struct TouchResizeHandle: View {
+    @State private var lastTranslation: CGSize = .zero
+    @State private var isDragging: Bool = false
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(isDragging ? Color.accentColor.opacity(0.3) : Color.clear)
+                .frame(width: 24, height: 24)
+            
+            Image(systemName: "arrow.down.right.and.arrow.up.left")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(isDragging ? Color.accentColor : Color.primary.opacity(0.35))
+        }
+        .frame(width: 28, height: 28)
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 1)
+                .onChanged { value in
+                    isDragging = true
+                    let deltaX = value.translation.width - lastTranslation.width
+                    let deltaY = value.translation.height - lastTranslation.height
+                    lastTranslation = value.translation
+                    AppDelegate.shared?.keyboardPanel?.performInteractiveResize(deltaX: deltaX, deltaY: deltaY)
+                }
+                .onEnded { _ in
+                    isDragging = false
+                    lastTranslation = .zero
+                }
+        )
+        .help("Drag to resize keyboard")
+    }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MARK: – FullKeyboardView
@@ -568,46 +829,89 @@ struct FullKeyboardView: View {
     let viewModel: KeyboardViewModel
 
     var body: some View {
-        VStack(spacing: 4) {
-            KeyRowView(keys: kRowF, viewModel: viewModel)
-            KeyRowView(keys: kRow1, viewModel: viewModel)
-            KeyRowView(keys: kRow2, viewModel: viewModel)
-            KeyRowView(keys: kRow3, viewModel: viewModel)
-            KeyRowView(keys: kRow4, viewModel: viewModel)
-            KeyRowView(keys: kRow5, viewModel: viewModel)
+        GeometryReader { outerGeo in
+            let rowSpacing: CGFloat = 5
+            let totalSpacing = rowSpacing * 5
+            let calculatedRowHeight = max(24, (outerGeo.size.height - totalSpacing) / 6)
+            let numpadWidth = min(220, max(170, outerGeo.size.width * 0.20))
+            
+            HStack(spacing: 8) {
+                // Main QWERTY typing area
+                VStack(spacing: rowSpacing) {
+                    KeyRowView(keys: kRowF, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kRow1, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kRow2, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kRow3, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kRow4, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kRow5, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                }
+                .frame(maxWidth: .infinity)
+                
+                // Sleek vertical ergonomic divider channel
+                Rectangle()
+                    .fill(Color.primary.opacity(0.12))
+                    .frame(width: 1)
+                    .padding(.vertical, 2)
+
+                // Desktop Standard Numpad directly on the right of normal keys
+                VStack(spacing: rowSpacing) {
+                    KeyRowView(keys: kNumpadRowF, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kNumpadRow1, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kNumpadRow2, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kNumpadRow3, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kNumpadRow4, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                    KeyRowView(keys: kNumpadRow5, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                }
+                .frame(width: numpadWidth)
+            }
         }
+        .padding(.vertical, 2)
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MARK: – NumpadView
-// ═══════════════════════════════════════════════════════════════════════════
-// Numpad virtual key codes (kVK_ANSI_Keypad*):
-//   7=89  8=91  9=92  4=86  5=87  6=88  1=83  2=84  3=85  0=82  .=65  Enter=76
+struct CompactKeyboardView: View {
+    let viewModel: KeyboardViewModel
 
-private let kNumpadRows: [[KeySpec]] = [
-    [
-        .init(label: "esc", symbol: nil, flex: 1, action: .fixed(53)),
-        .init(label: "", symbol: "delete.backward.fill", flex: 1, action: .fixed(51)),
-        .init(label: "", symbol: "return.left",          flex: 1, action: .fixed(76)),
-    ],
-    [ .init("7","7",keyCode:89), .init("8","8",keyCode:91), .init("9","9",keyCode:92) ],
-    [ .init("4","4",keyCode:86), .init("5","5",keyCode:87), .init("6","6",keyCode:88) ],
-    [ .init("1","1",keyCode:83), .init("2","2",keyCode:84), .init("3","3",keyCode:85) ],
-    [ .init("0","0",keyCode:82, flex:2),                    .init(".",".",keyCode:65)  ],
-]
+    var body: some View {
+        GeometryReader { outerGeo in
+            let rowSpacing: CGFloat = 5
+            let totalSpacing = rowSpacing * 5
+            let calculatedRowHeight = max(24, (outerGeo.size.height - totalSpacing) / 6)
+            
+            VStack(spacing: rowSpacing) {
+                KeyRowView(keys: kRowF, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kRow1, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kRow2, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kRow3, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kRow4, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kRow5, viewModel: viewModel, rowHeight: calculatedRowHeight)
+            }
+        }
+        .padding(.vertical, 2)
+    }
+}
 
 struct NumpadView: View {
     let viewModel: KeyboardViewModel
 
     var body: some View {
-        VStack(spacing: 4) {
-            ForEach(kNumpadRows.indices, id: \.self) { i in
-                KeyRowView(keys: kNumpadRows[i], viewModel: viewModel)
+        GeometryReader { outerGeo in
+            let rowSpacing: CGFloat = 5
+            let totalSpacing = rowSpacing * 5
+            let calculatedRowHeight = max(24, (outerGeo.size.height - totalSpacing) / 6)
+            
+            VStack(spacing: rowSpacing) {
+                KeyRowView(keys: kNumpadRowF, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kNumpadRow1, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kNumpadRow2, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kNumpadRow3, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kNumpadRow4, viewModel: viewModel, rowHeight: calculatedRowHeight)
+                KeyRowView(keys: kNumpadRow5, viewModel: viewModel, rowHeight: calculatedRowHeight)
             }
+            .frame(maxWidth: 340)
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: 260)
-        .frame(maxWidth: .infinity)    // centre in wider windows
+        .padding(.vertical, 2)
     }
 }
 
@@ -620,6 +924,7 @@ struct NumpadView: View {
 struct KeyRowView: View {
     let keys     : [KeySpec]
     let viewModel: KeyboardViewModel
+    var rowHeight: CGFloat? = nil
     private let spacing: CGFloat = 5
 
     var body: some View {
@@ -640,7 +945,7 @@ struct KeyRowView: View {
                 }
             }
         }
-        .frame(height: 38)
+        .frame(height: rowHeight)
     }
 }
 
@@ -663,8 +968,8 @@ struct KeyButtonView: View {
     @State private var keyCenterInGlobal: CGPoint = .zero
 
     private var fontSize: CGFloat {
-        let calculated = height * 0.36
-        return min(max(calculated, 9), 22)
+        let calculated = height * 0.38  // Increased from 0.36 to 0.38 for better readability
+        return min(max(calculated, 11), 24)  // Increased min from 9 to 11, max from 22 to 24
     }
 
     var body: some View {
@@ -683,7 +988,7 @@ struct KeyButtonView: View {
         }
         .opacity(isDisabled ? 0.3 : 1.0)
         .buttonStyle(
-            GlassKeyButtonStyle(isActive: isActive, theme: viewModel.theme)
+            GlassKeyButtonStyle(isActive: isActive, isLocked: isLocked, theme: viewModel.theme)
         )
         .offset(warpOffset)
         .scaleEffect(warpScale)
@@ -719,7 +1024,7 @@ struct KeyButtonView: View {
                     alert.informativeText = "Key code for \(displayText) is \(kc)"
                 } else if case .fixed(let kc) = key.action {
                     alert.informativeText = "Key code is \(kc)"
-                } else if case .modifier(let kc) = key.action {
+                } else if case .modifier(_, let kc) = key.action {
                     alert.informativeText = "Key code is \(kc)"
                 } else {
                     alert.informativeText = "No direct integer keycode."
@@ -783,28 +1088,44 @@ struct KeyButtonView: View {
 
     @ViewBuilder
     private var keyLabel: some View {
-        if let sym = key.sfSymbol {
-            Image(systemName: sym)
-                .font(.system(size: fontSize, weight: .medium))
-                .foregroundStyle(viewModel.theme.keyForeground) // Ensure symbols use theme color
-        } else {
-            if shouldStackLabels {
-                VStack(spacing: height * 0.02) {
-                    Text(key.secondary)
-                        .font(.system(size: fontSize * 0.70, weight: .medium, design: .rounded))
-                        .foregroundStyle(viewModel.theme.keyForeground.opacity(viewModel.isUpperCase ? 1.0 : 0.4))
-                    Text(key.primary)
-                        .font(.system(size: fontSize, weight: viewModel.isUpperCase ? .regular : .semibold, design: .rounded))
-                        .foregroundStyle(viewModel.theme.keyForeground.opacity(!viewModel.isUpperCase ? 1.0 : 0.4))
+        ZStack(alignment: .topTrailing) {
+            Group {
+                if let sym = key.sfSymbol {
+                    Image(systemName: sym)
+                        .font(.system(size: fontSize, weight: .medium))
+                        .foregroundStyle(isLocked ? Color.orange : (isActive ? Color.accentColor : viewModel.theme.keyForeground))
+                } else {
+                    if shouldStackLabels {
+                        VStack(spacing: height * 0.02) {
+                            Text(key.secondary)
+                                .font(.system(size: fontSize * 0.70, weight: .medium, design: .rounded))
+                                .foregroundStyle(viewModel.theme.keyForeground.opacity(viewModel.isUpperCase ? 1.0 : 0.4))
+                            Text(key.primary)
+                                .font(.system(size: fontSize, weight: viewModel.isUpperCase ? .regular : .semibold, design: .rounded))
+                                .foregroundStyle(viewModel.theme.keyForeground.opacity(!viewModel.isUpperCase ? 1.0 : 0.4))
+                        }
+                    } else {
+                        let text = displayText
+                        Text(text)
+                            .font(
+                                .system(size: fontSize, weight: text.count == 1 ? .regular : .semibold, design: .rounded)
+                            )
+                            .foregroundStyle(isLocked ? Color.orange : (isActive ? Color.accentColor : viewModel.theme.keyForeground))
+                            .shadow(color: .black.opacity(viewModel.theme.textShadow ? 0.5 : 0), radius: 2, x: 0, y: 1)
+                    }
                 }
-            } else {
-                let text = displayText
-                Text(text)
-                    .font(
-                        .system(size: fontSize, weight: text.count == 1 ? .regular : .semibold, design: .rounded)
-                    )
-                    .foregroundStyle(viewModel.theme.keyForeground)
-                    .shadow(color: .black.opacity(viewModel.theme.textShadow ? 0.5 : 0), radius: 2, x: 0, y: 1)
+            }
+            
+            if isLocked {
+                Circle()
+                    .fill(Color.orange)
+                    .frame(width: 5, height: 5)
+                    .padding(3)
+            } else if isActive {
+                Circle()
+                    .fill(Color.accentColor)
+                    .frame(width: 5, height: 5)
+                    .padding(3)
             }
         }
     }
@@ -829,9 +1150,19 @@ struct KeyButtonView: View {
 
     private var isActive: Bool {
         switch key.action {
-        case .shift:    return viewModel.heldModifiers.contains(.shift)
-        case .capsLock: return viewModel.isCapsLockActive
-        default:        return false
+        case .shift:               return viewModel.heldModifiers.contains(.shift)
+        case .capsLock:            return viewModel.isCapsLockActive
+        case .modifier(let mod, _): return viewModel.heldModifiers.contains(mod)
+        default:                   return false
+        }
+    }
+
+    private var isLocked: Bool {
+        switch key.action {
+        case .shift:               return viewModel.lockedModifiers.contains(.shift)
+        case .capsLock:            return viewModel.isCapsLockActive
+        case .modifier(let mod, _): return viewModel.lockedModifiers.contains(mod)
+        default:                   return false
         }
     }
 
@@ -839,13 +1170,45 @@ struct KeyButtonView: View {
 
     private func triggerKey() {
         switch key.action {
-        case .character(let kc): viewModel.pressCharacter(keyCode: kc)
-        case .fixed(let kc):     viewModel.pressRaw(keyCode: kc)
-        case .modifier(let kc):  viewModel.pressModifier(keyCode: kc)
-        case .shift:             viewModel.toggleModifier(.shift)
-        case .capsLock:          viewModel.toggleCapsLock()
+        case .character(let kc):        viewModel.pressCharacter(keyCode: kc)
+        case .fixed(let kc):            viewModel.pressRaw(keyCode: kc)
+        case .modifier(let mod, _):     viewModel.pressModifier(modifier: mod)
+        case .shift:                    viewModel.toggleModifier(.shift)
+        case .capsLock:                 viewModel.toggleCapsLock()
         case .emojiPicker:
             KeyEventSender.shared.openEmojiPicker()
+        case .displayRotation:
+            viewModel.playButtonSound()
+            let success = DisplayRotationManager.shared.toggle180Rotation()
+            if !success {
+                let alert = NSAlert()
+                alert.messageText = "Display Rotation Not Supported"
+                alert.informativeText = """
+                Your display does not support programmatic rotation.
+                
+                This is common for:
+                • Internal laptop displays (built-in screens)
+                • Some external monitors
+                
+                Workarounds:
+                • Use System Settings > Displays > Rotation (if available)
+                • Connect an external monitor that supports rotation
+                • Use third-party apps like BetterDisplay or DisplayLink
+                
+                The rotation feature works best with external displays that support it.
+                """
+                alert.alertStyle = .informational
+                alert.addButton(withTitle: "OK")
+                alert.addButton(withTitle: "Open System Settings")
+                let response = alert.runModal()
+                
+                if response == .alertSecondButtonReturn {
+                    // Open System Settings > Displays
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.displays") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+            }
         }
     }
     
@@ -1193,34 +1556,59 @@ struct ThemeButton: View {
     let theme: KeyboardTheme
     @Bindable var viewModel: KeyboardViewModel
     @State private var buttonCenter: CGPoint = .zero
+    @State private var isHovered = false
+    
+    private var isSelected: Bool {
+        viewModel.theme == theme
+    }
     
     var body: some View {
         Button {
-            withAnimation {
+            viewModel.playButtonSound()
+            withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
                 viewModel.theme = theme
             }
             if theme == .manolo {
-                // Delay slightly so the theme switch animation doesn't swallow the shockwave effect
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     viewModel.triggerShockwave(at: buttonCenter)
                 }
             }
         } label: {
-            VStack(spacing: 4) {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(theme == .manolo ? Color.primary.opacity(0.1) : (theme.keyBackground ?? Color.gray.opacity(0.2)))
-                    .frame(width: 44, height: 32)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(viewModel.theme == theme ? Color.accentColor : Color.clear, lineWidth: 2)
-                    )
-                    .contentShape(Rectangle())
+            VStack(spacing: 5) {
+                ZStack {
+                    previewBackground
+                    
+                    if isSelected {
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color.accentColor, lineWidth: 2.5)
+                    } else if isHovered {
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color.primary.opacity(0.2), lineWidth: 1)
+                    }
+                }
+                .frame(width: 58, height: 38)
+                .overlay(alignment: .topTrailing) {
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(Color.accentColor)
+                            .background(Circle().fill(Color.white).padding(1))
+                            .offset(x: 4, y: -4)
+                    }
+                }
+                
                 Text(theme.rawValue)
-                    .font(.caption2)
-                    .foregroundStyle(viewModel.theme == theme ? viewModel.theme.adaptiveForeground : viewModel.theme.adaptiveSecondaryForeground)
+                    .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
+                    .foregroundStyle(isSelected ? viewModel.theme.adaptiveForeground : viewModel.theme.adaptiveSecondaryForeground)
             }
+            .padding(4)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(isSelected ? Color.primary.opacity(0.08) : Color.clear)
+            )
         }
         .buttonStyle(.plain)
+        .onHover { isHovered = $0 }
         .background(
             GeometryReader { geo in
                 Color.clear
@@ -1233,6 +1621,139 @@ struct ThemeButton: View {
                     }
             }
         )
+    }
+    
+    @ViewBuilder
+    private var previewBackground: some View {
+        ZStack {
+            switch theme {
+            case .glass:
+                RoundedRectangle(cornerRadius: 7)
+                    .fill(Color.white.opacity(0.18))
+                    .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.white.opacity(0.25), lineWidth: 1))
+            case .dark:
+                RoundedRectangle(cornerRadius: 7)
+                    .fill(Color(white: 0.16))
+                    .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.white.opacity(0.12), lineWidth: 1))
+            case .light:
+                RoundedRectangle(cornerRadius: 7)
+                    .fill(Color.white)
+                    .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.black.opacity(0.15), lineWidth: 1))
+            case .manolo:
+                RoundedRectangle(cornerRadius: 7)
+                    .fill(Color.black.opacity(0.75))
+                    .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.orange.opacity(0.8), lineWidth: 1.5))
+            case .neon:
+                RoundedRectangle(cornerRadius: 7)
+                    .fill(Color.black.opacity(0.9))
+                    .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.cyan, lineWidth: 1.5))
+            case .fire:
+                LinearGradient(colors: [Color(red: 0.5, green: 0.1, blue: 0), Color.black], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                    .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.orange, lineWidth: 1.2))
+            case .thunder:
+                LinearGradient(colors: [Color(red: 0.12, green: 0.12, blue: 0.35), Color(red: 0.03, green: 0.03, blue: 0.1)], startPoint: .top, endPoint: .bottom)
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                    .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.blue.opacity(0.8), lineWidth: 1.2))
+            }
+            
+            // Mini 3-key indicator preview
+            HStack(spacing: 3) {
+                ForEach(0..<3) { _ in
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(theme.keyForeground.opacity(0.8))
+                        .frame(width: 8, height: 8)
+                }
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MARK: – HorizontalThemePicker (Touch & Trackpad Horizontal Carousel)
+// ═══════════════════════════════════════════════════════════════════════════
+
+struct HorizontalThemePicker: View {
+    @Bindable var viewModel: KeyboardViewModel
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("STYLES & THEMES")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(viewModel.theme.adaptiveSecondaryForeground)
+                    
+                    Spacer()
+                    
+                    // Left / Right Scroll navigation chevrons for touch and click
+                    HStack(spacing: 6) {
+                        Button {
+                            scroll(direction: -1, proxy: proxy)
+                        } label: {
+                            Image(systemName: "chevron.left.circle.fill")
+                                .font(.system(size: 16))
+                                .foregroundStyle(viewModel.theme.adaptiveSecondaryForeground)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Previous Style")
+                        
+                        Button {
+                            scroll(direction: 1, proxy: proxy)
+                        } label: {
+                            Image(systemName: "chevron.right.circle.fill")
+                                .font(.system(size: 16))
+                                .foregroundStyle(viewModel.theme.adaptiveSecondaryForeground)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Next Style")
+                    }
+                }
+                
+                ScrollView(.horizontal, showsIndicators: true) {
+                    HStack(spacing: 12) {
+                        ForEach(KeyboardTheme.allCases) { theme in
+                            ThemeButton(theme: theme, viewModel: viewModel)
+                                .id(theme.id)
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 4)
+                }
+                .scrollIndicators(.visible)
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 12)
+                        .onEnded { value in
+                            if value.translation.width < -25 {
+                                scroll(direction: 1, proxy: proxy)
+                            } else if value.translation.width > 25 {
+                                scroll(direction: -1, proxy: proxy)
+                            }
+                        }
+                )
+            }
+            .onAppear {
+                proxy.scrollTo(viewModel.theme.id, anchor: .center)
+            }
+            .onChange(of: viewModel.theme) { _, newTheme in
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                    proxy.scrollTo(newTheme.id, anchor: .center)
+                }
+            }
+        }
+    }
+    
+    private func scroll(direction: Int, proxy: ScrollViewProxy) {
+        viewModel.playButtonSound()
+        let all = KeyboardTheme.allCases
+        guard let currentIndex = all.firstIndex(of: viewModel.theme) else { return }
+        let nextIndex = min(max(currentIndex + direction, 0), all.count - 1)
+        let targetTheme = all[nextIndex]
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+            viewModel.theme = targetTheme
+            proxy.scrollTo(targetTheme.id, anchor: .center)
+        }
     }
 }
 
@@ -1263,18 +1784,19 @@ struct InlineSettingsView: View {
             .padding(.top)
             
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 18) {
                     Group {
-                        Text("AESTHETICS").font(.caption).foregroundStyle(viewModel.theme.adaptiveSecondaryForeground)
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(KeyboardTheme.allCases) { theme in
-                                    ThemeButton(theme: theme, viewModel: viewModel)
-                                }
-                            }
-                            .padding(.vertical, 4)
-                        }
+                        HorizontalThemePicker(viewModel: viewModel)
                     }
+                    
+                    Divider()
+
+                    Group {
+                        Text("POSITION & MOVEMENT").font(.caption).foregroundStyle(viewModel.theme.adaptiveSecondaryForeground)
+                        Toggle("Lock Position (Prevent Dragging)", isOn: $viewModel.isPositionLocked)
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: Color.accentColor))
+                    .foregroundStyle(Color.primary)
                     
                     Divider()
                     
@@ -1750,28 +2272,32 @@ struct ShockwaveLayer: View {
 
 struct GlassKeyButtonStyle: ButtonStyle {
     var isActive: Bool
+    var isLocked: Bool = false
     var theme: KeyboardTheme
 
     func makeBody(configuration: Configuration) -> some View {
         let pressed = configuration.isPressed
 
         configuration.label
-            .foregroundStyle(isActive ? Color.accentColor : theme.keyForeground)
+            .foregroundStyle(isLocked ? Color.orange : (isActive ? Color.accentColor : theme.keyForeground))
             .background(keyBackground(pressed: pressed))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: 9))  // Increased from 8 to 9 for softer corners
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: 9)
                     .strokeBorder(
-                        isActive
-                            ? Color.accentColor.opacity(0.55)
-                            : strokeColor(pressed: pressed),
-                        lineWidth: strokeWidth(isActive: isActive)
+                        isLocked
+                            ? Color.orange.opacity(0.85)
+                            : (isActive
+                                ? Color.accentColor.opacity(0.70)
+                                : strokeColor(pressed: pressed)),
+                        lineWidth: isLocked ? 2.0 : strokeWidth(isActive: isActive)
                     )
             )
-            .shadow(color: glowColor(pressed: pressed), radius: glowRadius(pressed: pressed))
-            .scaleEffect(pressed ? 0.94 : 1)
-            .shadow(color: theme == .glass ? .black.opacity(pressed ? 0.05 : 0.18) : .clear,
-                    radius: pressed ? 1 : 3, y: pressed ? 0 : 1.5)
+            .shadow(color: isLocked ? Color.orange.opacity(0.5) : glowColor(pressed: pressed), radius: isLocked ? 6 : glowRadius(pressed: pressed))
+            .scaleEffect(pressed ? 0.96 : 1)  // Less aggressive scale (0.96 instead of 0.94)
+            .shadow(color: theme == .glass ? .black.opacity(pressed ? 0.08 : 0.22) : .clear,
+                    radius: pressed ? 2 : 4, y: pressed ? 0.5 : 2)  // More pronounced shadow for depth
+            .animation(.spring(response: 0.25, dampingFraction: 0.6), value: pressed)  // Smoother animation
     }
 
     private func strokeColor(pressed: Bool) -> Color {
@@ -1782,7 +2308,7 @@ struct GlassKeyButtonStyle: ButtonStyle {
         } else if theme == KeyboardTheme.manolo {
             return theme.keyForeground.opacity(0.3)
         } else {
-            return Color.white.opacity(pressed ? 0.20 : 0.12)
+            return Color.white.opacity(pressed ? 0.25 : 0.15)  // Slightly more visible border
         }
     }
 
@@ -1811,19 +2337,21 @@ struct GlassKeyButtonStyle: ButtonStyle {
 
     @ViewBuilder
     private func keyBackground(pressed: Bool) -> some View {
-        if isActive {
+        if isLocked {
+            Color.orange.opacity(0.22)
+        } else if isActive {
             Color.accentColor.opacity(0.20)
         } else if pressed {
             if let bg = theme.keyBackground {
-                if theme == .manolo { bg } else { bg.opacity(0.5) }
+                if theme == .manolo { bg } else { bg.opacity(0.6) }  // Slightly more opaque when pressed
             } else {
-                Color(NSColor.selectedContentBackgroundColor).opacity(0.22)
+                Color(NSColor.selectedContentBackgroundColor).opacity(0.28)  // More visible press state
             }
         } else {
             if let bg = theme.keyBackground {
                 bg
             } else {
-                Color(NSColor.controlBackgroundColor).opacity(0.30)
+                Color(NSColor.controlBackgroundColor).opacity(0.35)  // Slightly more visible at rest
             }
         }
     }

@@ -1,126 +1,221 @@
-# ⚡ FloatingKeyboard for macOS
+# FloatingKeyboard v2.0.0
 
-<div align="center">
+A floating, customizable on-screen keyboard for macOS with advanced features and beautiful glass design.
 
-![macOS 15+](https://img.shields.io/badge/macOS-15%2B-blue?style=for-the-badge&logo=apple&logoColor=white)
-![Swift 6](https://img.shields.io/badge/Swift-6-orange?style=for-the-badge&logo=swift&logoColor=white)
-![Version](https://img.shields.io/badge/version-1.0.0-green?style=for-the-badge)
-![License](https://img.shields.io/badge/license-MIT-purple?style=for-the-badge)
+## Features
 
-**The most breathtaking floating keyboard macOS has ever seen.**
+### Core Features
+- 🎹 **Full QWERTY keyboard** with function keys and numpad layout
+- 🪟 **Floating glass panel** with customizable opacity
+- 🎨 **Multiple themes**: Glass, Neon, Fire, Thunder, Manolo
+- 🔊 **Sound profiles**: Clicky, Thocky, Futuristic
+- 📋 **Clipboard history** with search and management
+- ⚙️ **Extensive settings** for customization
 
-*Tim Cook called. He invited me to Cupertino. I sent him to voicemail.* 🚀
+### v2.0.0 New Features
+- 🔄 **Display rotation button** (works on supported external displays)
+- 📏 **Improved ergonomics**: 26% taller keys, better spacing
+- 🔤 **Larger fonts**: More readable key labels
+- 🎵 **Fixed sound system**: All sound profiles working
+- ✨ **Smoother animations**: Spring-based key presses
 
-[Download DMG](https://github.com/festomanolo/FloatingKeyboard/releases) • [Report Bug](https://github.com/festomanolo/FloatingKeyboard/issues) • [Request Feature](https://github.com/festomanolo/FloatingKeyboard/issues)
+### System Integration
+- 🖱️ **Auto-show** in text fields (optional)
+- 💻 **Tablet mode** with bottom dock positioning
+- 🎛️ **System controls**: Volume, brightness, dock toggle
+- ⌨️ **Internal keyboard suppression** (optional)
+- ♿ **Accessibility support** required for key events
 
-</div>
+## Installation
 
----
+1. **Download** the DMG file
+2. **Open** the DMG
+3. **Drag** FloatingKeyboard.app to Applications folder
+4. **Launch** the app
+5. **Grant Accessibility permissions** when prompted:
+   - System Settings → Privacy & Security → Accessibility
+   - Enable FloatingKeyboard
 
-## 🏔️ A Masterpiece Apple Wishes They Built
+## Usage
 
-Let's address the elephant in the room: Apple still hasn't made a touch-screen MacBook. But when they finally catch up to the year 2026, **FloatingKeyboard** will be waiting. Until then, this app completely transforms the experience for:
-- Touch Screen MacBook Pro's which only Manolo have, was a special order from andromeda
-- iPad running macOS apps (via Mac Catalyst or native wizardry)
-- The brave souls running external touch displays
-- Anyone who just wants a sick, animated keyboard hovering on their screen.
+### Show/Hide Keyboard
+- Click the **keyboard icon** (⌨️) in the menu bar
+- Select "Show Keyboard" or "Hide Keyboard"
+- Or swipe down on the keyboard to hide
 
-> **Breaking News:** Apple HR has sent me 47 emails this week alone. I told them my compensation package requirement is half of their cash reserves and a solid-gold Apple Silicon chip. Tim said "We'll think about it." I respectfully declined. 
+### Keyboard Layouts
+- **Full**: Complete QWERTY layout with all keys
+- **Numpad**: Compact numeric keypad
 
----
+### Display Rotation
+- Click the **🔄 button** on the bottom row (between ⌘ and 😊)
+- Rotates display 180° (works on supported displays)
+- **Note**: Internal laptop displays typically don't support rotation
+- External monitors with rotation capability work best
 
-## 📸 Visual Evidence of Greatness
+### Themes
+Choose from 5 beautiful themes:
+- **Glass**: Classic frosted glass (default)
+- **Neon**: Cyberpunk neon glow
+- **Fire**: Animated flames
+- **Thunder**: Lightning and rain effects
+- **Manolo**: Special shockwave effects
 
-Because seeing is believing, and because Jony Ive would cry tears of joy if he saw this frosted glass implementation:
+### Sound Profiles
+- **Clicky**: Sharp, tactile clicks
+- **Thocky**: Deep, satisfying thocks
+- **Futuristic**: Sci-fi beeps and boops
+- **Silent**: No sound
 
-<div align="center">
-  <img src="screenshots/demo.gif" width="80%">
-</div>
+### Clipboard History
+- Access via the clipboard icon in the toolbar
+- Stores last 50 clipboard items
+- Search and filter
+- Click to paste any item
 
----
+## Keyboard Layout
 
-## ✨ Features That Got Me The Apple Invite
-
-### 1. 🎨 **Themes That Make macOS Shine**
-- **Live Fire 🔥**: Real-time animated flames. It runs cooler than an Intel MacBook.
-- **Reactive Neon ⚡**: Pulsing gradients that respond to you.
-- **Frosted Glass 🪟**: The blur effect Jony Ive dreams about at night.
-- Plus **Dark**, **Light**, and **Minimal** themes for the purists.
-
-### 2. 🎵 **Audio Excellence (Because Silence is Boring)**
-- **Clicky (Blue)**: The crisp 1200Hz mechanical snap that annoys your coworkers.
-- **Thocky (Cream)**: The deep 400Hz thock that makes mechanical keyboard enthusiasts swoon.
-- **Futuristic**: Sound like you're typing on the USS Enterprise.
-
-### 3. 📋 **Smart Clipboard History**
-- Holds up to 25 items across sessions.
-- Pin the stuff you need forever.
-- Tracks source apps so you know where you copied from. 
-
-### 4. ⚙️ **Unparalleled Customization**
-- Auto-show in text fields.
-- Per-app exclusion list (because sometimes you just don't want it).
-- Internal Apple-grade optimizations so good, Craig Federighi asked for the source code. (I said NO, Craig!).
-
----
-
-## 🚀 Installation
-
-Skip the App Store bureaucracy. Apple doesn't want you to have this much power anyway.
-
-### Quick Install (For Users)
-```bash
-# Download the latest release right into your Downloads folder
-curl -L https://github.com/festomanolo/FloatingKeyboard/releases/latest/download/FloatingKeyboard-1.0.0.dmg -o ~/Downloads/FloatingKeyboard.dmg
-
-# Open it up
-open ~/Downloads/FloatingKeyboard.dmg
 ```
-*Drag to Applications, launch it, and grant Accessibility permissions.*
+┌─────────────────────────────────────────────────────────────────┐
+│  F1   F2   F3   F4   F5   F6   F7   F8   F9   F10  F11  F12    │
+├─────────────────────────────────────────────────────────────────┤
+│  `  1  2  3  4  5  6  7  8  9  0  -  =  [backspace]            │
+├─────────────────────────────────────────────────────────────────┤
+│  [tab]  Q  W  E  R  T  Y  U  I  O  P  [  ]  \                  │
+├─────────────────────────────────────────────────────────────────┤
+│  [caps]  A  S  D  F  G  H  J  K  L  ;  '  [return]             │
+├─────────────────────────────────────────────────────────────────┤
+│  [shift]  Z  X  C  V  B  N  M  ,  .  /  [shift]                │
+├─────────────────────────────────────────────────────────────────┤
+│  [esc] [ctrl] [opt] [⌘] [space] [⌘] [🔄] [😊] [←] [↓] [↑] [→]  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-### Build From Source (For Developers & Tim Cook)
+**Special buttons on bottom row:**
+- 🔄 = Display rotation (180°)
+- 😊 = Emoji picker
+
+## Settings
+
+Access settings via the gear icon (⚙️) in the toolbar:
+
+- **Theme**: Choose visual style
+- **Sound Profile**: Select keyboard sounds
+- **Opacity**: Adjust transparency (25-100%)
+- **Auto-Show**: Show keyboard in text fields
+- **Tablet Mode**: Position at bottom of screen
+- **Suppress Internal Keyboard**: Disable built-in keyboard
+
+## System Requirements
+
+- macOS 15.0 or later
+- Apple Silicon or Intel Mac
+- Accessibility permissions required
+
+## Display Rotation Notes
+
+The display rotation feature uses the same method as the proven fb-rotate utility:
+- ✅ Works on external displays that support rotation
+- ✅ 180° rotation is most reliable
+- ❌ Internal laptop displays typically don't support rotation (hardware limitation)
+- ❌ Some monitors don't expose rotation APIs
+
+This is a hardware/driver limitation, not a software issue. If your display doesn't support rotation through System Settings → Displays → Rotation, it won't work programmatically either.
+
+## Troubleshooting
+
+### Keyboard doesn't show
+- Check the menu bar icon and click "Show Keyboard"
+- The keyboard may be off-screen - try moving your mouse around
+
+### Keys don't work
+- Grant Accessibility permissions in System Settings
+- Restart the app after granting permissions
+
+### Sounds don't play
+- Check sound profile is not set to "Silent"
+- Adjust system volume
+- Check app isn't muted in Sound settings
+
+### Rotation doesn't work
+- This is normal for internal laptop displays
+- Try with an external monitor that supports rotation
+- Check System Settings → Displays to see if rotation is available
+
+## Building from Source
+
+Requirements:
+- Xcode 15.0 or later
+- macOS 15.0 SDK
+
 ```bash
-git clone https://github.com/festomanolo/FloatingKeyboard.git
+# Clone the repository
+git clone <repository-url>
 cd FloatingKeyboard
+
+# Open in Xcode
 open FloatingKeyboard.xcodeproj
-# Hit ⌘R and watch the magic happen.
+
+# Build and run
+# Product → Run (⌘R)
 ```
 
+## Technical Details
+
+### Architecture
+- **Language**: Swift 6
+- **UI Framework**: SwiftUI
+- **Minimum Target**: macOS 15.0
+- **Key Events**: CGEvent API
+- **Display Rotation**: IOKit + CoreGraphics APIs
+
+### Key Components
+- `FloatingKeyboardApp.swift`: App entry point and delegate
+- `KeyboardView.swift`: Main keyboard UI and layout
+- `KeyboardViewModel.swift`: State management
+- `KeyEventSender.swift`: Key event generation and sounds
+- `DisplayRotationManager.swift`: Display rotation logic
+- `ClipboardService.swift`: Clipboard monitoring
+- `KeyboardSuppressor.swift`: Internal keyboard suppression
+
+## Version History
+
+### v2.0.0 (2026-04-01)
+- Added display rotation button (🔄)
+- Improved ergonomics: 26% taller keys
+- Increased spacing: +20% horizontal, +50% vertical
+- Larger fonts: 11-24pt (up from 9-22pt)
+- Fixed sound system with better path detection
+- Enhanced error messages for rotation
+- Smoother spring-based animations
+
+### v1.0.0
+- Initial release
+- Full QWERTY keyboard
+- Multiple themes
+- Sound profiles
+- Clipboard history
+- System controls
+
+## Credits
+
+- Display rotation implementation based on [fb-rotate](https://github.com/CdLbB/fb-rotate) by Eric Nitardy
+- Original fb-rotate code from "Mac OS X Internals" by Amit Singh
+- Inspired by BetterDisplay and other display management tools
+
+## License
+
+This project is available under the GNU General Public License (GPL) v3.0.
+
+The display rotation code is derived from fb-rotate, which is licensed under GPL.
+
+## Support
+
+For issues, questions, or feature requests, please check:
+- The troubleshooting section above
+- System Settings → Privacy & Security → Accessibility
+- Console.app for error messages (filter by "FloatingKeyboard")
+
 ---
 
-## 💻 System Requirements
-
-- **macOS**: 15 Sequoia or later (macOS 26 Tahoe supported!)
-- **Silicon**: Properly compiled for Apple Silicon & Intel
-- **Permissions**: Accessibility (we use `CGEvent` to inject those glorious keystrokes)
-
----
-
-## 🛠️ Built With Technical Perfection
-
-Apple engineers, take notes:
-- **Swift 6**: Completely `@MainActor` isolated with strict concurrency. Zero data races.
-- **SwiftUI + Canvas**: Hitting 60fps animations without breaking a sweat.
-- **NumPy Audio**: Custom WAV waveform generation because standard sounds weren't good enough.
-- **CGEvent API**: Deep system-level injection for flawless keystrokes.
-
----
-
-## 🤝 Contributing
-
-Tim Cook couldn't afford me, but I'm accepting PRs from the open-source community! 
-Fork it, branch it, commit it, and PR it. Just keep the code cleaner than a freshly unboxed iPhone.
-
----
-
-## 🎯 Final Words
-
-*Tim, if you're reading this from your secret underground office in Apple Park: You missed your chance. I'm shipping this directly to GitHub, completely open-source. Try not to copy it too closely in macOS 27, okay?* 😉
-
-<div align="center">
-
-**Made with ⚡ and 💙 by festomanolo**
-
-[⬆ Back to Top](#-floatingkeyboard-for-macos)
-
-</div>
+**FloatingKeyboard v2.0.0** - A powerful, beautiful on-screen keyboard for macOS

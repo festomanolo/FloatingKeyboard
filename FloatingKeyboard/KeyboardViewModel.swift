@@ -14,9 +14,28 @@ import IOKit.hidsystem
 // MARK: – Layout mode
 
 enum KeyboardLayout: String, CaseIterable, Identifiable {
-    case full   = "Full"
-    case numpad = "Numpad"
+    case full    = "Desktop"
+    case compact = "Compact"
+    case numpad  = "Numpad"
     var id: String { rawValue }
+}
+
+enum WindowSizePreset: String, CaseIterable, Identifiable {
+    case compact  = "Compact"
+    case standard = "Standard"
+    case comfort  = "Comfort"
+    case docked   = "Docked"
+    
+    var id: String { rawValue }
+    
+    var icon: String {
+        switch self {
+        case .compact: return "arrow.down.right.and.arrow.up.left"
+        case .standard: return "rectangle.center.inset.filled"
+        case .comfort: return "arrow.up.left.and.arrow.down.right"
+        case .docked: return "dock.rectangle"
+        }
+    }
 }
 
 // MARK: - Core Data Models
@@ -100,8 +119,9 @@ enum KeyboardTheme: String, CaseIterable, Identifiable {
 }
 
 enum SoundProfile: String, CaseIterable, Identifiable {
-    case clicky = "Clicky (Blue)"
-    case thocky = "Thocky (Cream)"
+    case thocky = "Thocky (Holy Panda)"
+    case clicky = "Clicky (Cherry Blue)"
+    case tactile = "Tactile (Cherry Brown)"
     case futuristic = "Futuristic"
     
     var id: String { rawValue }
@@ -118,6 +138,7 @@ extension UserDefaults {
         static let autoShowEnabled = "autoShowEnabled"
         static let isTabletModeEnabled = "isTabletModeEnabled"
         static let isInternalKeyboardDisabled = "isInternalKeyboardDisabled"
+        static let isPositionLocked = "isPositionLocked"
     }
 }
 
@@ -189,7 +210,20 @@ final class KeyboardViewModel {
     }
     
     var heldModifiers: Set<ModifierKey> = []
+    var lockedModifiers: Set<ModifierKey> = []
+    private var lastModifierTapTime: [ModifierKey: Date] = [:]
     var isCapsLockActive: Bool = false
+    
+    var soundVolume: Double = 0.85 {
+        didSet { UserDefaults.standard.set(soundVolume, forKey: "soundVolume") }
+    }
+    
+    var activeSizePreset: WindowSizePreset = .standard {
+        didSet {
+            UserDefaults.standard.set(activeSizePreset.rawValue, forKey: "sizePreset")
+            NotificationCenter.default.post(name: NSNotification.Name("WindowSizePresetChanged"), object: activeSizePreset)
+        }
+    }
     
     var excludedApps: Set<String> = []
     
@@ -222,6 +256,13 @@ final class KeyboardViewModel {
         didSet { 
             UserDefaults.standard.set(isInternalKeyboardDisabled, forKey: UserDefaults.Keys.isInternalKeyboardDisabled)
             NotificationCenter.default.post(name: NSNotification.Name("InternalKeyboardToggleChanged"), object: nil)
+        }
+    }
+
+    var isPositionLocked: Bool = true {
+        didSet {
+            UserDefaults.standard.set(isPositionLocked, forKey: UserDefaults.Keys.isPositionLocked)
+            NotificationCenter.default.post(name: NSNotification.Name("KeyboardPositionLockChanged"), object: isPositionLocked)
         }
     }
 
@@ -306,6 +347,21 @@ final class KeyboardViewModel {
 
         if UserDefaults.standard.object(forKey: UserDefaults.Keys.isInternalKeyboardDisabled) != nil {
             isInternalKeyboardDisabled = UserDefaults.standard.bool(forKey: UserDefaults.Keys.isInternalKeyboardDisabled)
+        }
+        
+        if UserDefaults.standard.object(forKey: UserDefaults.Keys.isPositionLocked) != nil {
+            isPositionLocked = UserDefaults.standard.bool(forKey: UserDefaults.Keys.isPositionLocked)
+        } else {
+            isPositionLocked = true
+        }
+        
+        if UserDefaults.standard.object(forKey: "soundVolume") != nil {
+            soundVolume = UserDefaults.standard.double(forKey: "soundVolume")
+        }
+        
+        if let presetStr = UserDefaults.standard.string(forKey: "sizePreset"),
+           let preset = WindowSizePreset(rawValue: presetStr) {
+            activeSizePreset = preset
         }
         
         loadExcludedApps()
@@ -398,20 +454,61 @@ final class KeyboardViewModel {
     // ── Derived ─────────────────────────────────────────────────────────────
     var isUpperCase: Bool { heldModifiers.contains(.shift) || isCapsLockActive }
 
-    // ── Modifier toggles ────────────────────────────────────────────────────
+    // ── Modifier toggles & Combinations ─────────────────────────────────────
+
+    func isModifierActive(_ modifier: ModifierKey) -> Bool {
+        return heldModifiers.contains(modifier)
+    }
+
+    func isModifierLocked(_ modifier: ModifierKey) -> Bool {
+        return lockedModifiers.contains(modifier)
+    }
 
     func toggleModifier(_ modifier: ModifierKey) {
-        if heldModifiers.contains(modifier) {
-            heldModifiers.remove(modifier)
+        let now = Date()
+        let isDoubleTap = lastModifierTapTime[modifier].map { now.timeIntervalSince($0) < 0.35 } ?? false
+        
+        if isDoubleTap {
+            // Double-tap locks the modifier (like Caps Lock)
+            if lockedModifiers.contains(modifier) {
+                lockedModifiers.remove(modifier)
+                heldModifiers.remove(modifier)
+            } else {
+                lockedModifiers.insert(modifier)
+                heldModifiers.insert(modifier)
+            }
+            lastModifierTapTime[modifier] = nil
         } else {
-            heldModifiers.insert(modifier)
+            lastModifierTapTime[modifier] = now
+            if lockedModifiers.contains(modifier) {
+                // If it was locked, tap unlocks and clears it
+                lockedModifiers.remove(modifier)
+                heldModifiers.remove(modifier)
+            } else if heldModifiers.contains(modifier) {
+                // Single tap disarms a sticky modifier
+                heldModifiers.remove(modifier)
+            } else {
+                // Arm single-tap sticky modifier
+                heldModifiers.insert(modifier)
+            }
         }
+        
+        // Audio tactile feedback on modifier tap
+        KeyEventSender.shared.sendKey(keyCode: 0xFFFF, modifiers: [], profile: selectedSoundProfile, userVolume: soundVolume)
+    }
+
+    func releaseTransientModifiers() {
+        // Automatically release sticky modifiers after a key shortcut executes,
+        // preserving any explicitly double-tapped locked modifiers.
+        heldModifiers = heldModifiers.intersection(lockedModifiers)
+    }
+
+    func shouldAutoReleaseModifier(_ modifier: ModifierKey) -> Bool {
+        return heldModifiers.contains(modifier) && !lockedModifiers.contains(modifier)
     }
 
     func toggleCapsLock() {
         toggleSystemCapsLock()
-        // No need to manually toggle isCapsLockActive here; updateCapsLockState() 
-        // will detect the CGEvent we just posted via the system's flags state.
     }
 
     func updateCapsLockState() {
@@ -423,37 +520,45 @@ final class KeyboardViewModel {
 
     private func toggleSystemCapsLock() {
         // CGEvent posted with .cghidEventTap for key code 57 correctly toggles the Caps Lock hardware state
-        KeyEventSender.shared.sendKey(keyCode: 57, modifiers: [], profile: selectedSoundProfile)
-    }
-
-    func shouldAutoReleaseModifier(_ modifier: ModifierKey) -> Bool {
-        return modifier == .shift && !isCapsLockActive
+        KeyEventSender.shared.sendKey(keyCode: 57, modifiers: [], profile: selectedSoundProfile, userVolume: soundVolume)
     }
 
     // ── Key press actions ───────────────────────────────────────────────────
 
-    /// Press a character key, applying the current shift/caps-lock state.
-    /// One-shot shift: Shift releases automatically after each character
-    /// (unless Caps Lock is also on).
+    /// Press a character key, applying all active modifiers (Cmd, Ctrl, Opt, Shift, Caps Lock).
+    /// Auto-releases transient sticky modifiers so shortcuts (Cmd+C, Cmd+V, etc.) feel completely natural.
     func pressCharacter(keyCode: CGKeyCode) {
+        let effectiveModifiers = isCapsLockActive ? heldModifiers.union([.shift]) : heldModifiers
         KeyEventSender.shared.sendKey(
             keyCode: keyCode,
-            modifiers: isCapsLockActive ? heldModifiers.union([.shift]) : heldModifiers,
-            profile: selectedSoundProfile
+            modifiers: effectiveModifiers,
+            profile: selectedSoundProfile,
+            userVolume: soundVolume
         )
-        if shouldAutoReleaseModifier(.shift) {
-            heldModifiers.remove(.shift)
-        }
+        releaseTransientModifiers()
     }
 
-    /// Press a key with no modifier (backspace, enter, tab, arrows, etc.).
+    /// Press a non-character key (backspace, enter, tab, arrow keys, etc.) with active modifiers.
     func pressRaw(keyCode: CGKeyCode) {
-        KeyEventSender.shared.sendKey(keyCode: keyCode, modifiers: heldModifiers, profile: selectedSoundProfile)
+        KeyEventSender.shared.sendKey(
+            keyCode: keyCode,
+            modifiers: heldModifiers,
+            profile: selectedSoundProfile,
+            userVolume: soundVolume
+        )
+        releaseTransientModifiers()
     }
 
-    /// Press a modifier key tap (Cmd, Opt, Ctrl) — stateless, no toggle.
-    func pressModifier(keyCode: CGKeyCode) {
-        KeyEventSender.shared.sendKey(keyCode: keyCode, modifiers: heldModifiers, profile: selectedSoundProfile)
+    /// Toggles a modifier (Cmd, Opt, Ctrl, Shift).
+    func pressModifier(modifier: ModifierKey) {
+        toggleModifier(modifier)
+    }
+
+    /// Play tactile mechanical switch sound for any UI button (tabs, presets, quick actions, settings).
+    func playButtonSound() {
+        if soundEnabled {
+            KeyEventSender.shared.playClickSound(profile: selectedSoundProfile, volume: soundVolume)
+        }
     }
     
     // ── System Utilities ────────────────────────────────────────────────────

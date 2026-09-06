@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FloatingKeyboard — The Next-Level Floating Keyboard for macOS & Touchscreen</title>
+  <meta name="description" content="Next-level floating on-screen keyboard for macOS and Touchscreen Hackintosh. Features polyphonic mechanical switch sounds, zero focus steal, sticky modifiers, and position locking.">
+  <meta property="og:title" content="FloatingKeyboard for macOS">
+  <meta property="og:description" content="The ultimate floating touch keyboard with mechanical switches, zero focus stealing, and safari-style pills.">
+  <meta property="og:image" content="assets/screenshots/keyboard-desktop-neon.png">
+  <meta property="og:type" content="website">
+  
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230A84FF%22/><text y=%2268%22 x=%2250%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>⌨️</text></svg>">
+</head>
+<body>
+
+  <!-- Ambient Glow Background Orbs -->
+  <div class="bg-glow-container">
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+    <div class="glow-orb glow-orb-3"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
+          </svg>
+        </div>
+        <span class="brand-name">FloatingKeyboard</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#sounds">Mechanical Sounds</a></li>
+        <li><a href="#layouts">Layouts</a></li>
+        <li><a href="#themes">Themes</a></li>
+        <li><a href="#touchscreen">Touch & Ergonomics</a></li>
+        <li><a href="#download">Download</a></li>
+      </ul>
+
+      <div class="nav-cta">
+        <a href="downloads/FloatingKeyboard.dmg" class="btn btn-primary" download>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download .DMG
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero" id="overview">
+      <div class="hero-pill">
+        <span class="hero-pill-badge">v2.0 Release</span>
+        <span>Engineered for Touchscreen Hackintosh & Mac</span>
+      </div>
+
+      <h1 class="hero-title">
+        The Next-Level Touch Keyboard<br>
+        <span class="gradient-text">for macOS & Hackintosh.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Never steals window focus. Features polyphonic mechanical switch acoustic feedback, Safari-style layout pills, sticky modifier combos, and locked-position typing.
+      </p>
+
+      <div class="hero-actions">
+        <a href="downloads/FloatingKeyboard.dmg" class="btn btn-primary btn-large" download>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download for macOS (1.7 MB)
+        </a>
+        <a href="#sounds" class="btn btn-secondary btn-large">
+          Try Sound Engine
+        </a>
+      </div>
+
+      <div class="hero-meta">
+        <span><svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> macOS 14+ (Sonoma & Sequoia)</span>
+        <span><svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Apple Silicon & Intel Universal</span>
+        <span><svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Non-Activating Focus Guard</span>
+      </div>
+
+      <!-- Live Interactive Showcase -->
+      <div class="hero-preview-wrapper" id="themes">
+        <div class="preview-topbar">
+          <div class="mac-traffic-lights">
+            <div class="mac-light light-close"></div>
+            <div class="mac-light light-min"></div>
+            <div class="mac-light light-max"></div>
+          </div>
+
+          <div class="preview-theme-selector">
+            <button class="theme-tab active" data-theme="glass">Glass</button>
+            <button class="theme-tab" data-theme="neon">Neon</button>
+            <button class="theme-tab" data-theme="fire">Fire</button>
+            <button class="theme-tab" data-theme="thunder">Thunder</button>
+            <button class="theme-tab" data-theme="dark">Dark</button>
+            <button class="theme-tab" data-theme="light">Light</button>
+            <button class="theme-tab" data-theme="manolo">Manolo</button>
+          </div>
+        </div>
+
+        <div class="preview-screen-container">
+          <img id="hero-preview-img" class="preview-image" src="assets/screenshots/keyboard-desktop-glass.png" alt="FloatingKeyboard Live Real Screenshot">
+          <canvas id="theme-animation-canvas"></canvas>
+        </div>
+
+        <div class="preview-caption">
+          <span id="preview-caption-text">Glass Theme — Classic frosted ultra-thin translucent glass with subtle refraction and dark system keycaps.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Mechanical Sound Board -->
+    <section class="section" id="sounds">
+      <div class="section-header">
+        <div class="section-eyebrow">Acoustic Feedback</div>
+        <h2 class="section-title">Polyphonic Mechanical Switches.</h2>
+        <p class="section-subtitle">
+          Touchscreens don't have physical travel, so we built an eighteen-player sound engine with real mechanical switch profiles. Test the acoustic profiles right now in your browser:
+        </p>
+      </div>
+
+      <div class="sound-board-card">
+        <div class="sound-profile-selector">
+          <button class="profile-chip active" data-profile="thocky">
+            <span class="profile-chip-dot" style="color: #64D2FF;"></span>
+            Holy Panda (Thocky)
+          </button>
+          <button class="profile-chip" data-profile="clicky">
+            <span class="profile-chip-dot" style="color: #0A84FF;"></span>
+            Cherry MX Blue (Clicky)
+          </button>
+          <button class="profile-chip" data-profile="tactile">
+            <span class="profile-chip-dot" style="color: #FF9F0A;"></span>
+            Cherry MX Brown (Tactile)
+          </button>
+          <button class="profile-chip" data-profile="futuristic">
+            <span class="profile-chip-dot" style="color: #BF5AF2;"></span>
+            Futuristic Synth
+          </button>
+        </div>
+
+        <!-- Tactile Key Caps Grid -->
+        <div class="keys-demo-grid">
+          <div class="key-cap" data-key="Q">Q<span class="key-cap-sub">#1</span></div>
+          <div class="key-cap" data-key="W">W<span class="key-cap-sub">#2</span></div>
+          <div class="key-cap" data-key="E">E<span class="key-cap-sub">#3</span></div>
+          <div class="key-cap" data-key="R">R<span class="key-cap-sub">#4</span></div>
+          <div class="key-cap" data-key="T">T<span class="key-cap-sub">#5</span></div>
+          <div class="key-cap" data-key="Y">Y<span class="key-cap-sub">#6</span></div>
+          <div class="key-cap" data-key="U">U<span class="key-cap-sub">#7</span></div>
+          <div class="key-cap" data-key="CMD">⌘<span class="key-cap-sub">cmd</span></div>
+          <div class="key-cap" data-key="SPACE" style="grid-column: span 2;">SPACE<span class="key-cap-sub">thock</span></div>
+        </div>
+
+        <p class="sound-instruction">
+          👆 Click or tap any key above, or type on your physical keyboard to hear the real-time synthesized acoustic profiles!
+        </p>
+      </div>
+    </section>
+
+    <!-- 3 Core Layout Modes -->
+    <section class="section" id="layouts">
+      <div class="section-header">
+        <div class="section-eyebrow">Adaptive Layouts</div>
+        <h2 class="section-title">One-Tap Safari Tab Pills.</h2>
+        <p class="section-subtitle">
+          Switch between three specialized layouts in a split-second with sleek capsule tab pills inspired by Apple visionOS and Safari.
+        </p>
+      </div>
+
+      <div class="modes-grid">
+        <!-- Desktop Card -->
+        <div class="mode-card">
+          <div class="mode-badge">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H4V5h16v14z"/></svg>
+            Desktop Full
+          </div>
+          <h3>Full QWERTY + Numpad</h3>
+          <p>Complete 6-row layout with F1–F12 function row, full numeric keypad, arrow cluster, and quick system modifiers.</p>
+          <div class="mode-img-box">
+            <img src="assets/screenshots/keyboard-desktop-glass.png" alt="Desktop Layout">
+          </div>
+        </div>
+
+        <!-- Compact Card -->
+        <div class="mode-card">
+          <div class="mode-badge">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm2 5h12v2H6zm3 5h6v2H9z"/></svg>
+            Compact Mode
+          </div>
+          <h3>Minimal Distraction-Free</h3>
+          <p>Removes the numpad and distributes key width across the viewport. Ideal for tablet setups and coding on laptops.</p>
+          <div class="mode-img-box">
+            <img src="assets/screenshots/keyboard-compact.png" alt="Compact Layout">
+          </div>
+        </div>
+
+        <!-- Numpad Card -->
+        <div class="mode-card">
+          <div class="mode-badge">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 4h2v2h-2V7zm0 4h2v2h-2v-2zm-4-4h2v2H7V7zm0 4h2v2H7v-2zm-2 6v-2h14v2H5zm12-6h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
+            Dedicated Numpad
+          </div>
+          <h3>Financial & Numeric Entry</h3>
+          <p>Dedicated calculation pad with oversized arithmetic operators, double-zero, backspace, and quick decimal point.</p>
+          <div class="mode-img-box">
+            <img src="assets/screenshots/keyboard-numpad.png" alt="Numpad Layout">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Engineered for Touchscreen & Hackintosh -->
+    <section class="section" id="touchscreen">
+      <div class="section-header">
+        <div class="section-eyebrow">Hackintosh & Touch Engineering</div>
+        <h2 class="section-title">Built for Real Touch Displays.</h2>
+        <p class="section-subtitle">
+          Standard virtual keyboards in macOS were never designed for real work on touchscreens. FloatingKeyboard re-engineers the entire experience from the ground up:
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon-pod">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Position Locking (Zero Accidental Drags)</h3>
+            <p>Rest your palm or fingers anywhere without accidentally moving the window. Toggle with a single tap on the toolbar amber lock icon.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon-pod">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Zero Focus Hijacking (Non-Activating Panel)</h3>
+            <p>Engineered using NSPanel with <code>.nonactivatingPanel</code>. Type directly into VS Code, Xcode, Slack, or Safari without ever stealing window focus.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon-pod">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Sticky & Latching Modifiers</h3>
+            <p>Single tap latches ⌘, ⌥, ⌃, or ⇧ with glowing indicator. Double tap locks modifiers for complex shortcuts like ⌘+Shift+4 without awkward finger stretching.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon-pod">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Sensible Sizing (Never Blocks Content)</h3>
+            <p>Full screen keyboards make it impossible to see what you type. FloatingKeyboard strictly caps height to 42% of screen height and guarantees zero cutoff.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon-pod">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Integrated System Controls</h3>
+            <p>Adjust system volume, screen brightness, and window glass opacity via smooth pill sliders, or toggle Dock visibility with one tap.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon-pod">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 2h-4.18C14.4 .84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Built-In Clipboard History</h3>
+            <p>Access your copied snippets, text blocks, and URLs directly from the keyboard without third-party clipboard managers.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="download-section" id="download">
+      <div class="download-card">
+        <div class="download-info">
+          <h2>Get FloatingKeyboard for Mac</h2>
+          <p>
+            Download the official DMG installer. Fully packaged with retina drag-and-drop installer, optimized for Apple Silicon and Intel.
+          </p>
+
+          <div class="download-cta-group">
+            <a href="downloads/FloatingKeyboard.dmg" class="btn btn-primary btn-large" download>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download FloatingKeyboard.dmg
+            </a>
+            <span style="font-size: 13px; color: var(--text-tertiary);">Version 2.0.0 • 1.7 MB • Free Release</span>
+          </div>
+
+          <div class="dmg-specs">
+            <span><strong>Target:</strong> macOS 14.0+</span>
+            <span><strong>Architecture:</strong> Universal (x86_64 & arm64)</span>
+            <span><strong>License:</strong> MIT</span>
+          </div>
+        </div>
+
+        <div class="dmg-preview-frame">
+          <img src="assets/screenshots/dmg-installer-window.png" alt="FloatingKeyboard DMG Installer Preview">
+        </div>
+      </div>
+
+      <!-- 3-Step Installation Guide -->
+      <div class="section" style="padding-top: 56px; padding-bottom: 0;">
+        <div class="section-header" style="margin-bottom: 32px;">
+          <div class="section-eyebrow">Quick Setup</div>
+          <h2 class="section-title">Installed in 30 Seconds.</h2>
+        </div>
+
+        <div class="install-steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <h4>Open the .DMG</h4>
+            <p>Download and open <code>FloatingKeyboard.dmg</code> to reveal the installer window.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <h4>Drag to Applications</h4>
+            <p>Drag <code>FloatingKeyboard.app</code> into the Applications folder shortcut.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <h4>Grant Accessibility</h4>
+            <p>Launch the app and enable Accessibility permissions in <em>System Settings → Privacy & Security</em> so the keyboard can synthesize keystrokes.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="brand">
+        <div class="brand-icon" style="width: 28px; height: 28px;">
+          <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
+          </svg>
+        </div>
+        <span class="brand-name" style="font-size: 15px;">FloatingKeyboard</span>
+      </div>
+
+      <div class="footer-links">
+        <a href="#overview">Overview</a>
+        <a href="#sounds">Sound Engine</a>
+        <a href="#layouts">Layouts</a>
+        <a href="#themes">Themes</a>
+        <a href="#download">Download DMG</a>
+      </div>
+
+      <p>© 2026 FloatingKeyboard. Built with precision for macOS & Touchscreen Hackintosh.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

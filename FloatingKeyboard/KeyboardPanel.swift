@@ -36,9 +36,12 @@ final class KeyboardPanel: NSPanel {
         installSwiftUI()
         
         NotificationCenter.default.addObserver(self, selector: #selector(screenConfigurationChanged(_:)), name: NSApplication.didChangeScreenParametersNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(presetChangedNotification(_:)), name: NSNotification.Name("WindowSizePresetChanged"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(positionLockChangedNotification(_:)), name: NSNotification.Name("KeyboardPositionLockChanged"), object: nil)
         
         DispatchQueue.main.async { [weak self] in
             self?.validatePosition()
+            self?.updateSensibleSizeLimits()
         }
     }
 
@@ -53,7 +56,7 @@ final class KeyboardPanel: NSPanel {
         // Transparent chrome for the glass look.
         titlebarAppearsTransparent  = true
         titleVisibility             = .hidden
-        isMovableByWindowBackground = true
+        isMovableByWindowBackground = !viewModel.isPositionLocked
         isOpaque                    = false
         backgroundColor             = .clear
         hasShadow                   = true
@@ -61,15 +64,142 @@ final class KeyboardPanel: NSPanel {
         // Slide in/out like a standard utility window.
         animationBehavior = .utilityWindow
 
-        // Appear on every Space; don't show in Mission Control / Exposé cycling.
-        collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+        // Appear on every Space; NEVER allow full-screen; don't show in Mission Control.
+        collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
+
+        // Disable and hide standard window buttons for unified touchscreen aesthetic
+        standardWindowButton(.closeButton)?.isHidden = true
+        standardWindowButton(.closeButton)?.isEnabled = false
+        standardWindowButton(.miniaturizeButton)?.isHidden = true
+        standardWindowButton(.miniaturizeButton)?.isEnabled = false
+        standardWindowButton(.zoomButton)?.isHidden = true
+        standardWindowButton(.zoomButton)?.isEnabled = false
 
         // Persist the last position between launches.
         setFrameAutosaveName("FloatingKeyboard_Frame")
 
-        // Sensible size limits.
-        minSize = NSSize(width: 480,  height: 200)
-        maxSize = NSSize(width: 1800, height: 750)
+        // Enforce strictly sensible size limits
+        updateSensibleSizeLimits()
+    }
+
+    // MARK: – Disable Fullscreen & Zoom Override
+
+    override func zoom(_ sender: Any?) {
+        // Explicitly disabled: on-screen touch keyboard must never full-screen
+    }
+
+    override func toggleFullScreen(_ sender: Any?) {
+        // Explicitly disabled
+    }
+
+    // MARK: – Screen & Size Management
+
+    var currentScreen: NSScreen {
+        return self.screen ?? NSScreen.main ?? (NSScreen.screens.first ?? NSScreen())
+    }
+
+    func updateSensibleSizeLimits() {
+        let sf = currentScreen.visibleFrame
+        // Keyboard height clamped to max 42% of screen height so typed content is ALWAYS visible
+        let maxAllowedHeight = min(420, sf.height * 0.42)
+        minSize = NSSize(width: 760, height: 260)
+        maxSize = NSSize(width: sf.width, height: maxAllowedHeight)
+
+        if frame.height > maxAllowedHeight {
+            var f = frame
+            f.size.height = maxAllowedHeight
+            setFrame(f, display: true, animate: true)
+        }
+    }
+
+    @objc private func presetChangedNotification(_ notification: Notification) {
+        if let preset = notification.object as? WindowSizePreset {
+            applySizePreset(preset)
+        }
+    }
+
+    @objc private func positionLockChangedNotification(_ notification: Notification) {
+        if let locked = notification.object as? Bool {
+            self.isMovableByWindowBackground = !locked
+        }
+    }
+
+    // MARK: – Window Position Locking Overrides
+    
+    override func mouseDragged(with event: NSEvent) {
+        if viewModel.isPositionLocked {
+            return
+        }
+        super.mouseDragged(with: event)
+    }
+
+    override func performDrag(with event: NSEvent) {
+        if viewModel.isPositionLocked {
+            return
+        }
+        super.performDrag(with: event)
+    }
+
+    /// Smoothly applies touchscreen-optimized sizing presets
+    func applySizePreset(_ preset: WindowSizePreset) {
+        let sf = currentScreen.visibleFrame
+        var targetRect: NSRect
+        
+        switch preset {
+        case .compact:
+            let w: CGFloat = min(960, sf.width - 20)
+            let h: CGFloat = 295
+            let y = max(sf.minY + 12, min(frame.minY, sf.maxY - h - 12))
+            targetRect = NSRect(x: sf.midX - w / 2, y: y, width: w, height: h)
+            
+        case .standard:
+            let w: CGFloat = min(1120, sf.width - 20)
+            let h: CGFloat = 335
+            let y = max(sf.minY + 12, min(frame.minY, sf.maxY - h - 12))
+            targetRect = NSRect(x: sf.midX - w / 2, y: y, width: w, height: h)
+            
+        case .comfort:
+            let w: CGFloat = min(1300, sf.width - 20)
+            let h: CGFloat = min(375, sf.height * 0.42)
+            let y = max(sf.minY + 12, min(frame.minY, sf.maxY - h - 12))
+            targetRect = NSRect(x: sf.midX - w / 2, y: y, width: w, height: h)
+            
+        case .docked:
+            let w: CGFloat = sf.width
+            let h: CGFloat = min(345, sf.height * 0.40)
+            targetRect = NSRect(x: sf.minX, y: sf.minY, width: w, height: h)
+        }
+        
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.28
+            ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            self.animator().setFrame(targetRect, display: true)
+        }
+    }
+
+    /// Interactive touchscreen corner resize with sensible constraints
+    func performInteractiveResize(deltaX: CGFloat, deltaY: CGFloat) {
+        let sf = currentScreen.visibleFrame
+        let maxAllowedHeight = min(420, sf.height * 0.42)
+        
+        var newWidth = frame.width + deltaX
+        var newHeight = frame.height + deltaY
+        
+        newWidth = min(max(newWidth, 720), sf.width)
+        newHeight = min(max(newHeight, 230), maxAllowedHeight)
+        
+        var newFrame = frame
+        newFrame.size.width = newWidth
+        newFrame.size.height = newHeight
+        
+        if newFrame.maxY > sf.maxY {
+            newFrame.origin.y = sf.maxY - newHeight
+        }
+        if newFrame.minY < sf.minY {
+            newFrame.origin.y = sf.minY
+        }
+        
+        setFrame(newFrame, display: true)
     }
 
     // MARK: – SwiftUI root view
@@ -144,11 +274,11 @@ final class KeyboardPanel: NSPanel {
     private static func defaultFrame() -> NSRect {
         let screen = NSScreen.main ?? NSScreen.screens[0]
         let sf     = screen.visibleFrame
-        let w: CGFloat = 920
-        let h: CGFloat = 350
+        let w: CGFloat = min(1120, sf.width - 20)
+        let h: CGFloat = 335
         return NSRect(
             x: sf.midX - w / 2,
-            y: sf.minY + 20,
+            y: sf.minY + 16,
             width: w, height: h
         )
     }

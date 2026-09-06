@@ -1,174 +1,251 @@
 #!/bin/bash
 
-# FloatingKeyboard DMG Creation Script
-# Creates a beautiful installer DMG with custom background
+# FloatingKeyboard DMG Creator - Release Version
+# Creates a professional, distributable DMG package ready for sale
 
 set -e
 
+VERSION="2.0.0"
 APP_NAME="FloatingKeyboard"
-VERSION="1.0.0"
-DMG_NAME="${APP_NAME}-${VERSION}"
-BUILD_DIR="./build-output/Build/Products/Release"
-DMG_DIR="./dmg-build"
-FINAL_DMG="./${DMG_NAME}.dmg"
+DMG_NAME="${APP_NAME}-${VERSION}.dmg"
+VOLUME_NAME="${APP_NAME} ${VERSION}"
+TEMP_DMG="temp.dmg"
 
-# Clean up previous builds
-rm -rf "${DMG_DIR}"
-rm -f "${FINAL_DMG}"
-rm -f "${DMG_NAME}-temp.dmg"
-
-# Create DMG directory structure
-mkdir -p "${DMG_DIR}"
-
-# Build release version (Universal)
-echo "🏗️  Building Universal binary (arm64 + x86_64)..."
+echo "🔨 Building FloatingKeyboard (Release)..."
 xcodebuild -project FloatingKeyboard.xcodeproj \
-  -scheme FloatingKeyboard \
-  -configuration Release \
-  -derivedDataPath ./build-output \
-  ARCHS="arm64 x86_64" \
-  ONLY_ACTIVE_ARCH=NO \
-  clean build
+           -scheme FloatingKeyboard \
+           -configuration Release \
+           clean build \
+           CODE_SIGN_IDENTITY="-" \
+           CODE_SIGN_STYLE=Manual
 
-# Copy the app
-echo "📦 Copying application..."
-cp -R "${BUILD_DIR}/${APP_NAME}.app" "${DMG_DIR}/"
+# Find the Release build
+BUILD_DIR="$HOME/Library/Developer/Xcode/DerivedData/FloatingKeyboard-gznzvvrwyuzwwhehvcaapmusnepf/Build/Products/Release"
 
-# Remove quarantine attribute (BEFORE signing to avoid invalidating the seal)
-echo "1️⃣ Removing quarantine attribute..."
-xattr -cr "${DMG_DIR}/${APP_NAME}.app"
+# Check if build succeeded
+if [ ! -d "${BUILD_DIR}/${APP_NAME}.app" ]; then
+    echo "❌ Build failed - app not found at ${BUILD_DIR}"
+    exit 1
+fi
 
-# Ad-hoc sign (for distribution) with entitlements
-echo "✍️  Ad-hoc signing with entitlements..."
-codesign --force --deep --sign - \
-  --entitlements "./FloatingKeyboard/FloatingKeyboard.entitlements" \
-  "${DMG_DIR}/${APP_NAME}.app"
+echo "✅ Build successful!"
+echo ""
+echo "📦 Creating professional DMG package..."
 
-# Verify signature
-echo "🔍 Verifying signature..."
-codesign --verify --verbose "${DMG_DIR}/${APP_NAME}.app"
+# Remove old DMG if exists
+rm -f "${DMG_NAME}" "${TEMP_DMG}"
 
-# Create Applications symlink
-echo "🔗 Creating Applications symlink..."
-ln -s /Applications "${DMG_DIR}/Applications"
+# Create temporary DMG (larger size for professional package)
+hdiutil create -size 100m -fs HFS+ -volname "${VOLUME_NAME}" "${TEMP_DMG}"
 
-# Create README
-echo "📝 Creating README..."
-cat > "${DMG_DIR}/README.txt" << 'EOF'
-FloatingKeyboard v1.0.0
-=======================
+# Mount it
+echo "📂 Mounting DMG..."
+MOUNT_DIR=$(hdiutil attach "${TEMP_DMG}" | grep "/Volumes/${VOLUME_NAME}" | awk '{print $3}')
 
-A beautiful, feature-rich floating keyboard for macOS 15+
+if [ -z "$MOUNT_DIR" ]; then
+    echo "❌ Failed to mount DMG"
+    exit 1
+fi
 
-⚠️ IMPORTANT: First Time Opening
-================================
-macOS Gatekeeper may block this app because it's not notarized.
+echo "📋 Copying files to DMG..."
 
-To open the app:
-1. Right-click (or Control-click) on FloatingKeyboard.app
-2. Hold the Option key
-3. Click "Open"
-4. Click "Open" in the dialog
+# Copy app
+cp -R "${BUILD_DIR}/${APP_NAME}.app" "${MOUNT_DIR}/"
 
-OR run this command in Terminal:
-  xattr -cr /Applications/FloatingKeyboard.app
+# Create Applications symlink for easy installation
+ln -s /Applications "${MOUNT_DIR}/Applications"
 
-This only needs to be done once!
+# Copy README
+cp README.md "${MOUNT_DIR}/README.md"
 
-Installation:
-=============
-1. Drag FloatingKeyboard.app to the Applications folder
-2. Open FloatingKeyboard from Applications (see above)
-3. Grant Accessibility permissions when prompted
-4. Enjoy your new floating keyboard!
+# Copy LICENSE
+cp LICENSE "${MOUNT_DIR}/LICENSE.txt"
 
-Features:
-=========
-✨ Multiple themes (Glass, Dark, Light, Minimal, Neon, Fire)
-🎵 Sound profiles (Clicky, Thocky, Futuristic)
-🎚️ Volume & Brightness controls (Dynamic Island style)
-📋 Clipboard history
-⚙️ Customizable settings
-🎨 Live animated backgrounds
-⌨️ Full QWERTY + Numpad layouts
+# Create professional installation instructions
+cat > "${MOUNT_DIR}/INSTALL.txt" << 'EOF'
+╔══════════════════════════════════════════════════════════════╗
+║          FloatingKeyboard v2.0.0 - Installation              ║
+╚══════════════════════════════════════════════════════════════╝
 
-Created by festomanolo
-GitHub: github.com/festomanolo
+Thank you for purchasing FloatingKeyboard!
 
-© 2026 festomanolo. All rights reserved.
+INSTALLATION STEPS:
+═══════════════════
+
+1. Drag "FloatingKeyboard.app" to the "Applications" folder
+2. Launch FloatingKeyboard from Applications
+3. Grant Accessibility permissions when prompted:
+   → System Settings → Privacy & Security → Accessibility
+   → Enable FloatingKeyboard
+4. Click the keyboard icon (⌨️) in the menu bar
+5. Select "Show Keyboard"
+
+WHAT'S NEW IN v2.0.0:
+═══════════════════════
+
+✨ Display Rotation Button (🔄)
+   • Toggle 180° rotation on supported displays
+   • Located on bottom row between ⌘ and 😊
+
+✨ Improved Ergonomics
+   • 26% taller keys for better comfort
+   • Enhanced spacing (20% horizontal, 50% vertical)
+   • Larger, more readable fonts (11-24pt)
+
+✨ Enhanced Sound System
+   • All sound profiles working perfectly
+   • Clicky, Thocky, and Futuristic sounds
+   • Improved volume and clarity
+
+✨ Smoother Experience
+   • Spring-based animations
+   • Better visual feedback
+   • Enhanced performance
+
+FEATURES:
+═════════
+
+• Full QWERTY keyboard + numpad layout
+• 5 beautiful themes (Glass, Neon, Fire, Thunder, Manolo)
+• Sound profiles with realistic keyboard sounds
+• Clipboard history with search
+• System controls (volume, brightness, dock)
+• Auto-show in text fields
+• Tablet mode for bottom positioning
+• Internal keyboard suppression
+
+SUPPORT:
+════════
+
+For help and documentation, see README.md
+
+Display Rotation Note:
+• Works on external displays that support rotation
+• Internal laptop displays typically don't support rotation
+  (this is a hardware limitation, not a software issue)
+
+SYSTEM REQUIREMENTS:
+════════════════════
+
+• macOS 15.0 or later
+• Apple Silicon or Intel Mac
+• Accessibility permissions required
+
+═══════════════════════════════════════════════════════════════
+
+Enjoy your FloatingKeyboard!
+
+For questions or support, please refer to the documentation.
+
+═══════════════════════════════════════════════════════════════
 EOF
 
-# Calculate size
-echo "📏 Calculating size..."
-SIZE=$(du -sm "${DMG_DIR}" | awk '{print $1}')
-SIZE=$((SIZE + 50))  # Add 50MB buffer
+# Create a quick start guide
+cat > "${MOUNT_DIR}/QUICK_START.txt" << 'EOF'
+╔══════════════════════════════════════════════════════════════╗
+║              FloatingKeyboard - Quick Start                  ║
+╚══════════════════════════════════════════════════════════════╝
 
-# Create temporary DMG
-echo "💿 Creating temporary DMG..."
-hdiutil create -srcfolder "${DMG_DIR}" -volname "${APP_NAME}" -fs HFS+ \
-    -fsargs "-c c=64,a=16,e=16" -format UDRW -size ${SIZE}m "${DMG_NAME}-temp.dmg"
+FIRST TIME SETUP:
+═════════════════
 
-# Mount the temporary DMG
-echo "🔧 Mounting DMG..."
-DEVICE=$(hdiutil attach -readwrite -noverify -noautoopen "${DMG_NAME}-temp.dmg" | \
-    egrep '^/dev/' | sed 1q | awk '{print $1}')
-MOUNT_DIR="/Volumes/${APP_NAME}"
+1. Install the app (drag to Applications)
+2. Launch FloatingKeyboard
+3. Grant Accessibility permissions
+4. Done! Click the menu bar icon to show keyboard
 
-echo "Mounted at: ${MOUNT_DIR}"
+KEYBOARD SHORTCUTS:
+═══════════════════
 
-# Wait for mount
-sleep 2
+Show/Hide:  Click menu bar icon (⌨️)
+Swipe Down: Hide keyboard
+Emoji:      Click 😊 button
+Rotate:     Click 🔄 button (on supported displays)
 
-# Set DMG window properties
-echo "🎨 Configuring DMG appearance..."
-cat > /tmp/dmg-setup.applescript << EOF
-tell application "Finder"
-    tell disk "${APP_NAME}"
-        open
-        set current view of container window to icon view
-        set toolbar visible of container window to false
-        set statusbar visible of container window to false
-        set the bounds of container window to {100, 100, 700, 500}
-        set viewOptions to the icon view options of container window
-        set arrangement of viewOptions to not arranged
-        set icon size of viewOptions to 96
-        set background picture of viewOptions to file ".background:background.png"
-        set position of item "${APP_NAME}.app" of container window to {150, 200}
-        set position of item "Applications" of container window to {450, 200}
-        set position of item "README.txt" of container window to {300, 350}
-        close
-        open
-        update without registering applications
-        delay 2
-    end tell
-end tell
+KEYBOARD LAYOUT:
+════════════════
+
+Bottom Row Special Buttons:
+[esc] [ctrl] [opt] [⌘] [space] [⌘] [🔄] [😊] [←] [↓] [↑] [→]
+                                    ↑    ↑
+                              Rotate  Emoji
+
+THEMES:
+═══════
+
+• Glass - Classic frosted glass (default)
+• Neon - Cyberpunk neon glow
+• Fire - Animated flames
+• Thunder - Lightning effects
+• Manolo - Special shockwave effects
+
+Access themes via Settings (⚙️ icon)
+
+SOUND PROFILES:
+═══════════════
+
+• Clicky - Sharp, tactile clicks
+• Thocky - Deep, satisfying thocks
+• Futuristic - Sci-fi beeps
+• Silent - No sound
+
+TIPS:
+═════
+
+• Adjust opacity with the slider in toolbar
+• Use tablet mode for bottom positioning
+• Enable auto-show for automatic appearance
+• Suppress internal keyboard if using as primary
+
+═══════════════════════════════════════════════════════════════
+
+For complete documentation, see README.md
+
+═══════════════════════════════════════════════════════════════
 EOF
 
-# Create background directory
-mkdir -p "${MOUNT_DIR}/.background"
+echo "🎨 Finalizing DMG..."
 
-# Create a simple background image using ImageMagick or sips
-# For now, we'll skip the custom background as it requires additional tools
-# The DMG will still look professional with the icon arrangement
-
-# Run AppleScript to set window properties
-# osascript /tmp/dmg-setup.applescript || echo "⚠️  Could not set DMG window properties (this is optional)"
+# Set custom icon positions (if possible)
+# This would require AppleScript or additional tools
 
 # Unmount
-echo "💾 Finalizing DMG..."
-hdiutil detach "${MOUNT_DIR}"
-sleep 2
+hdiutil detach "${MOUNT_DIR}" -quiet
+
+echo "🗜️  Compressing DMG..."
 
 # Convert to compressed, read-only DMG
-echo "🗜️  Compressing DMG..."
-hdiutil convert "${DMG_NAME}-temp.dmg" -format UDZO -imagekey zlib-level=9 -o "${FINAL_DMG}"
+hdiutil convert "${TEMP_DMG}" -format UDZO -o "${DMG_NAME}" -quiet
 
-# Clean up
-rm -f "${DMG_NAME}-temp.dmg"
-rm -rf "${DMG_DIR}"
-rm -f /tmp/dmg-setup.applescript
+# Remove temp DMG
+rm -f "${TEMP_DMG}"
 
-echo "✅ DMG created successfully: ${FINAL_DMG}"
-echo "📦 Size: $(du -h "${FINAL_DMG}" | awk '{print $1}')"
+# Get DMG info
+DMG_SIZE=$(du -h "${DMG_NAME}" | awk '{print $1}')
+DMG_PATH=$(pwd)/${DMG_NAME}
+
 echo ""
-echo "🎉 Installation package ready for distribution!"
+echo "╔══════════════════════════════════════════════════════════════╗"
+echo "║                  ✅ DMG CREATED SUCCESSFULLY!                 ║"
+echo "╚══════════════════════════════════════════════════════════════╝"
+echo ""
+echo "📦 File: ${DMG_NAME}"
+echo "💾 Size: ${DMG_SIZE}"
+echo "📍 Path: ${DMG_PATH}"
+echo ""
+echo "🚀 READY FOR DISTRIBUTION!"
+echo ""
+echo "This DMG includes:"
+echo "  ✓ Release build (optimized)"
+echo "  ✓ Installation instructions"
+echo "  ✓ Quick start guide"
+echo "  ✓ Complete documentation"
+echo "  ✓ License file"
+echo "  ✓ Applications folder shortcut"
+echo ""
+echo "Next steps for selling:"
+echo "  1. Test the DMG on a clean Mac"
+echo "  2. Consider code signing for distribution"
+echo "  3. Notarize with Apple (for Gatekeeper)"
+echo "  4. Upload to your sales platform"
+echo ""

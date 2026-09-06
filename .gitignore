@@ -18,6 +18,8 @@ xcuserdata/
 
 ## Build generated
 build/
+build-debug/
+build-output/
 DerivedData/
 
 ## Various settings
@@ -124,9 +126,9 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# DMG files (keep source, ignore built DMG)
+# DMG and archive files (binaries belong in GitHub Releases)
 *.dmg
-!FloatingKeyboard-*.dmg
+*.zip
 
 # Temporary files
 *.tmp
@@ -140,9 +142,6 @@ Temporary Items
 # Build artifacts
 *.app
 *.xcarchive
-build-debug/
-build-output/
-build_log.txt
 
 # Test coverage
 *.profraw
